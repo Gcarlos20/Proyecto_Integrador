@@ -1,5 +1,6 @@
 package controller;
 
+import Dao.ProductoDao;
 import model.producto;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,24 +9,13 @@ import java.util.List;
  * CONTROLADOR: Producto Controller
  * Descripción: Gestiona la lógica de negocio para productos
  * Funcionalidades: CRUD de productos, validaciones, estadísticas
- * Nota: Conectar a base de datos en los métodos comentados
  */
 public class productoController {
-
-    // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-    // private DatabaseConnection db;
     
-    private List<producto> productos = new ArrayList<>();
-    private int contadorId = 4;
+    private final ProductoDao productoDao;
 
     public productoController() {
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // this.db = new DatabaseConnection();
-        
-        // Datos de prueba (ELIMINAR CUANDO SE CONECTE BD)
-        productos.add(new producto(1, "Laptop", 999.99, 5));
-        productos.add(new producto(2, "Mouse", 25.99, 50));
-        productos.add(new producto(3, "Teclado", 79.99, 20));
+        this.productoDao = new ProductoDao();
     }
 
     /**
@@ -37,13 +27,7 @@ public class productoController {
      */
     public boolean agregar(String nombre, double precio, int stock) {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "INSERT INTO productos (nombre, precio, stock) VALUES (?, ?, ?)";
-            // db.ejecutar(query, nombre, precio, stock);
-            // return true;
-
-            productos.add(new producto(contadorId++, nombre, precio, stock));
-            return true;
+            return productoDao.agregar(nombre, precio, stock);
         } catch (Exception e) {
             System.out.println("Error al agregar producto: " + e.getMessage());
             return false;
@@ -57,11 +41,7 @@ public class productoController {
      */
     public List<producto> listar() {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "SELECT * FROM productos";
-            // return db.obtenerProductos(query);
-
-            return productos;
+            return productoDao.listarTodos();
         } catch (Exception e) {
             System.out.println("Error al obtener productos: " + e.getMessage());
             return new ArrayList<>();
@@ -76,14 +56,7 @@ public class productoController {
      */
     public producto obtenerPorId(int id) {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "SELECT * FROM productos WHERE id = ?";
-            // return db.obtenerProducto(query, id);
-
-            for (producto p : productos) {
-                if (p.getId() == id) return p;
-            }
-            return null;
+            return productoDao.buscarPorId(id);
         } catch (Exception e) {
             System.out.println("Error al obtener producto: " + e.getMessage());
             return null;
@@ -100,20 +73,7 @@ public class productoController {
      */
     public boolean actualizar(int id, String nombre, double precio, int stock) {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "UPDATE productos SET nombre=?, precio=?, stock=? WHERE id=?";
-            // db.ejecutar(query, nombre, precio, stock, id);
-            // return true;
-
-            for (producto p : productos) {
-                if (p.getId() == id) {
-                    p.setNombre(nombre);
-                    p.setPrecio(precio);
-                    p.setStock(stock);
-                    return true;
-                }
-            }
-            return false;
+            return productoDao.actualizar(id, nombre, precio, stock);
         } catch (Exception e) {
             System.out.println("Error al actualizar producto: " + e.getMessage());
             return false;
@@ -127,12 +87,7 @@ public class productoController {
      */
     public boolean eliminar(int id) {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "DELETE FROM productos WHERE id=?";
-            // db.ejecutar(query, id);
-            // return true;
-
-            return productos.removeIf(p -> p.getId() == id);
+            return productoDao.eliminar(id);
         } catch (Exception e) {
             System.out.println("Error al eliminar producto: " + e.getMessage());
             return false;

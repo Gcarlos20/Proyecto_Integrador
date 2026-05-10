@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 /**
  * VISTA: Gestión de Productos
@@ -372,15 +373,12 @@ public class productoVista extends JFrame {
      */
     private void cargarTabla() {
         modelo.setRowCount(0);
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // List<producto> productos = controller.obtenerTodos();
-        // for (producto p : productos) {
-        //     modelo.addRow(new Object[]{p.getId(), p.getNombre(), p.getPrecio(), p.getStock()});
-        // }
-        
-        // DATOS DE PRUEBA (ELIMINAR CUANDO SE CONECTE BD)
-        modelo.addRow(new Object[]{1, "Laptop", 999.99, 5});
-        modelo.addRow(new Object[]{2, "Mouse", 25.99, 50});
-        modelo.addRow(new Object[]{3, "Teclado", 79.99, 20});
+
+        // BLOQUE: Cargar productos
+        // Para: Mostrar en la tabla los productos guardados en la base de datos.
+        List<producto> productos = controller.listar();
+        for (producto p : productos) {
+            modelo.addRow(new Object[]{p.getId(), p.getNombre(), p.getPrecio(), p.getStock()});
+        }
     }
 }

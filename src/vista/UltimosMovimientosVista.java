@@ -1,11 +1,13 @@
 package vista;
 
+import controller.MovimientoController;
+import model.movimiento;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * VISTA: Últimos Movimientos
@@ -14,6 +16,9 @@ import java.time.format.DateTimeFormatter;
  * Características: Filtrado por tipo, búsqueda, ordenamiento
  */
 public class UltimosMovimientosVista extends JFrame {
+
+    private final MovimientoController controller = new MovimientoController();
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public UltimosMovimientosVista() {
         setTitle("Últimos Movimientos");
@@ -99,20 +104,10 @@ public class UltimosMovimientosVista extends JFrame {
         tabla.getTableHeader().setBackground(new Color(30, 45, 70));
         tabla.getTableHeader().setForeground(Color.WHITE);
 
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // List<movimiento> movimientos = controller.obtenerMovimientosRecientes();
-        // for (movimiento m : movimientos) {
-        //     modelo.addRow(new Object[]{m.getId(), m.getProductoId(), m.getTipo(), 
-        //         m.getCantidad(), m.getFecha(), m.getUsuario(), m.getObservaciones()});
-        // }
-
-        // DATOS DE PRUEBA (ELIMINAR CUANDO SE CONECTE BD)
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        modelo.addRow(new Object[]{1, "Laptop", "ENTRADA", 10, "28/04/2026 10:30", "admin", "Compra a proveedor X"});
-        modelo.addRow(new Object[]{2, "Mouse", "SALIDA", 5, "28/04/2026 11:15", "usuario1", "Venta a cliente"});
-        modelo.addRow(new Object[]{3, "Teclado", "AJUSTE", -2, "28/04/2026 12:00", "admin", "Corrección de inventario"});
-        modelo.addRow(new Object[]{4, "Monitor", "ENTRADA", 3, "28/04/2026 14:45", "admin", "Compra"});
-        modelo.addRow(new Object[]{5, "Cable USB", "SALIDA", 20, "28/04/2026 16:20", "usuario1", "Venta a cliente"});
+        // BLOQUE: Cargar movimientos
+        // Para: Mostrar el historial real y actualizarlo segun el filtro seleccionado.
+        cargarMovimientos(modelo, "Todos");
+        cbTipo.addActionListener(e -> cargarMovimientos(modelo, (String) cbTipo.getSelectedItem()));
 
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setOpaque(false);
@@ -123,5 +118,26 @@ public class UltimosMovimientosVista extends JFrame {
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
         add(mainPanel);
+    }
+
+    // BLOQUE: Refrescar tabla
+    // Para: Cargar movimientos recientes o filtrar por tipo sin tocar el diseno.
+    private void cargarMovimientos(DefaultTableModel modelo, String tipo) {
+        modelo.setRowCount(0);
+        List<movimiento> movimientos = "Todos".equals(tipo)
+            ? controller.obtenerRecientes(50)
+            : controller.obtenerPorTipo(tipo);
+
+        for (movimiento m : movimientos) {
+            modelo.addRow(new Object[]{
+                m.getId(),
+                m.getProductoId(),
+                m.getTipo(),
+                m.getCantidad(),
+                m.getFecha().format(formatter),
+                m.getUsuario(),
+                m.getObservaciones()
+            });
+        }
     }
 }

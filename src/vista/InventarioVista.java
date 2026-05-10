@@ -1,9 +1,13 @@
 package vista;
 
+import controller.InventarioController;
+import controller.productoController;
+import model.producto;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 /**
  * VISTA: Inventario General
@@ -12,6 +16,9 @@ import java.awt.*;
  * Características: Diseño responsive, estadísticas en tiempo real
  */
 public class InventarioVista extends JFrame {
+
+    private final InventarioController inventarioController = new InventarioController();
+    private final productoController productoController = new productoController();
 
     public InventarioVista() {
         setTitle("Estado del Inventario");
@@ -65,10 +72,11 @@ public class InventarioVista extends JFrame {
         statsPanel.setLayout(new GridLayout(1, 4, 15, 0));
         statsPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
 
-        statsPanel.add(crearTarjetaEstadistica("Total Productos", "125", new Color(70, 150, 220)));
-        statsPanel.add(crearTarjetaEstadistica("Stock Total", "2,450 unidades", new Color(100, 180, 120)));
-        statsPanel.add(crearTarjetaEstadistica("Valor Inventario", "$45,230.50", new Color(220, 150, 70)));
-        statsPanel.add(crearTarjetaEstadistica("Bajo Stock", "12 productos", new Color(220, 100, 80)));
+        Object[] estadisticas = inventarioController.obtenerEstadisticas();
+        statsPanel.add(crearTarjetaEstadistica("Total Productos", String.valueOf(estadisticas[0]), new Color(70, 150, 220)));
+        statsPanel.add(crearTarjetaEstadistica("Stock Total", estadisticas[1] + " unidades", new Color(100, 180, 120)));
+        statsPanel.add(crearTarjetaEstadistica("Valor Inventario", "$" + String.format("%.2f", estadisticas[2]), new Color(220, 150, 70)));
+        statsPanel.add(crearTarjetaEstadistica("Bajo Stock", inventarioController.obtenerAlertasStock(10) + " productos", new Color(220, 100, 80)));
 
         centerPanel.add(statsPanel, BorderLayout.NORTH);
 
@@ -96,21 +104,15 @@ public class InventarioVista extends JFrame {
         tabla.getTableHeader().setBackground(new Color(30, 45, 70));
         tabla.getTableHeader().setForeground(Color.WHITE);
 
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // List<producto> productos = controller.obtenerTodos();
-        // for (producto p : productos) {
-        //     int stock = p.getStock();
-        //     String estado = stock <= 10 ? "Bajo Stock" : stock <= 50 ? "Normal" : "Alto";
-        //     modelo.addRow(new Object[]{p.getId(), p.getNombre(), stock, p.getPrecio(), 
-        //         stock * p.getPrecio(), estado});
-        // }
-
-        // DATOS DE PRUEBA (ELIMINAR CUANDO SE CONECTE BD)
-        modelo.addRow(new Object[]{1, "Laptop", 5, 999.99, 4999.95, "Normal"});
-        modelo.addRow(new Object[]{2, "Mouse", 50, 25.99, 1299.50, "Normal"});
-        modelo.addRow(new Object[]{3, "Teclado", 20, 79.99, 1599.80, "Normal"});
-        modelo.addRow(new Object[]{4, "Monitor", 8, 299.99, 2399.92, "Bajo Stock"});
-        modelo.addRow(new Object[]{5, "Cable USB", 150, 5.99, 898.50, "Alto"});
+        // BLOQUE: Cargar inventario
+        // Para: Mostrar productos reales con su valor total y estado de stock.
+        List<producto> productos = productoController.listar();
+        for (producto p : productos) {
+            int stock = p.getStock();
+            String estado = stock <= 10 ? "Bajo Stock" : stock <= 50 ? "Normal" : "Alto";
+            modelo.addRow(new Object[]{p.getId(), p.getNombre(), stock, p.getPrecio(),
+                stock * p.getPrecio(), estado});
+        }
 
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setOpaque(false);

@@ -173,7 +173,7 @@ public class LoginVista extends JFrame {
 
             Usuario u = controller.login(user, pass, rolSeleccionado);
 
-            if (u != null && u.getRol().equals(rolSeleccionado)) {
+            if (u != null) {
                 session.usuarioActual = u;
 
                 JOptionPane.showMessageDialog(this, "Bienvenido " + u.getRol(), 
@@ -182,7 +182,7 @@ public class LoginVista extends JFrame {
                 new DeshboardVista().setVisible(true);
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Credenciales o rol incorrecto", 
+                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", 
                     "Error de Login", JOptionPane.ERROR_MESSAGE);
             }
         });

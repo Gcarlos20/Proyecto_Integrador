@@ -1,32 +1,20 @@
 package controller;
 
+import Dao.MovimientoDao;
 import model.movimiento;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * CONTROLADOR: Movimiento Controller
  * Descripción: Gestiona el registro de movimientos de inventario
  * Funcionalidades: Registrar entradas, salidas, ajustes; obtener historial
- * Nota: Conectar a base de datos en los métodos comentados
  */
 public class MovimientoController {
 
-    // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-    // private DatabaseConnection db;
-    
-    private List<movimiento> movimientos = new ArrayList<>();
-    private int contadorId = 5;
+    private final MovimientoDao movimientoDao;
 
     public MovimientoController() {
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // this.db = new DatabaseConnection();
-        
-        // Datos de prueba
-        movimientos.add(new movimiento(1, 1, "ENTRADA", 10, LocalDateTime.now(), "admin", "Compra inicial"));
-        movimientos.add(new movimiento(2, 2, "SALIDA", 5, LocalDateTime.now(), "usuario1", "Venta"));
-        movimientos.add(new movimiento(3, 3, "AJUSTE", -2, LocalDateTime.now(), "admin", "Corrección"));
+        this.movimientoDao = new MovimientoDao();
     }
 
     /**
@@ -40,13 +28,7 @@ public class MovimientoController {
      */
     public boolean registrar(int productoId, String tipo, int cantidad, String usuario, String observaciones) {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "INSERT INTO movimientos (producto_id, tipo, cantidad, fecha, usuario, observaciones) VALUES (?, ?, ?, ?, ?, ?)";
-            // db.ejecutar(query, productoId, tipo, cantidad, LocalDateTime.now(), usuario, observaciones);
-            // return true;
-
-            movimientos.add(new movimiento(contadorId++, productoId, tipo, cantidad, LocalDateTime.now(), usuario, observaciones));
-            return true;
+            return movimientoDao.registrar(productoId, tipo, cantidad, usuario, observaciones);
         } catch (Exception e) {
             System.out.println("Error al registrar movimiento: " + e.getMessage());
             return false;
@@ -60,14 +42,10 @@ public class MovimientoController {
      */
     public List<movimiento> obtenerTodos() {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "SELECT * FROM movimientos ORDER BY fecha DESC";
-            // return db.obtenerMovimientos(query);
-
-            return movimientos;
+            return movimientoDao.obtenerTodos();
         } catch (Exception e) {
             System.out.println("Error al obtener movimientos: " + e.getMessage());
-            return new ArrayList<>();
+            return List.of();
         }
     }
 
@@ -78,11 +56,7 @@ public class MovimientoController {
      * @return Lista de movimientos recientes
      */
     public List<movimiento> obtenerRecientes(int limite) {
-        List<movimiento> recientes = new ArrayList<>(obtenerTodos());
-        if (recientes.size() > limite) {
-            return recientes.subList(recientes.size() - limite, recientes.size());
-        }
-        return recientes;
+        return movimientoDao.obtenerRecientes(limite);
     }
 
     /**
@@ -92,13 +66,7 @@ public class MovimientoController {
      * @return Lista de movimientos del producto
      */
     public List<movimiento> obtenerPorProducto(int productoId) {
-        List<movimiento> porProducto = new ArrayList<>();
-        for (movimiento m : obtenerTodos()) {
-            if (m.getProductoId() == productoId) {
-                porProducto.add(m);
-            }
-        }
-        return porProducto;
+        return movimientoDao.obtenerPorProducto(productoId);
     }
 
     /**
@@ -108,13 +76,7 @@ public class MovimientoController {
      * @return Lista de movimientos del tipo especificado
      */
     public List<movimiento> obtenerPorTipo(String tipo) {
-        List<movimiento> porTipo = new ArrayList<>();
-        for (movimiento m : obtenerTodos()) {
-            if (m.getTipo().equals(tipo)) {
-                porTipo.add(m);
-            }
-        }
-        return porTipo;
+        return movimientoDao.obtenerPorTipo(tipo);
     }
 
     /**
@@ -124,16 +86,6 @@ public class MovimientoController {
      * @return Saldo neto del producto
      */
     public int calcularSaldo(int productoId) {
-        int saldo = 0;
-        for (movimiento m : obtenerPorProducto(productoId)) {
-            if (m.getTipo().equals("ENTRADA")) {
-                saldo += m.getCantidad();
-            } else if (m.getTipo().equals("SALIDA")) {
-                saldo -= m.getCantidad();
-            } else if (m.getTipo().equals("AJUSTE")) {
-                saldo += m.getCantidad();
-            }
-        }
-        return saldo;
+        return movimientoDao.calcularSaldo(productoId);
     }
 }

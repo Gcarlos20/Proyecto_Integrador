@@ -1,5 +1,6 @@
 package vista;
 
+import conexion.conexionBD;
 import util.session;
 
 import javax.swing.*;
@@ -70,7 +71,7 @@ public class ConfiguracionVista extends JFrame {
         centerPanel.add(crearSeccionConfiguracion("Base de Datos"));
         centerPanel.add(crearOpcionConfiguracion("Servidor BD", "localhost"));
         centerPanel.add(crearOpcionConfiguracion("Puerto", "3306"));
-        centerPanel.add(crearOpcionConfiguracion("Base de Datos", "inventario_db"));
+        centerPanel.add(crearOpcionConfiguracion("Base de Datos", "inventario"));
 
         JButton btnConectarBD = new JButton("Probar Conexión");
         btnConectarBD.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -81,16 +82,14 @@ public class ConfiguracionVista extends JFrame {
         btnConectarBD.setFocusPainted(false);
         btnConectarBD.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnConectarBD.addActionListener(e -> {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // boolean conectado = DatabaseConnection.probarConexion();
-            // if (conectado) {
-            //     JOptionPane.showMessageDialog(this, "Conexión exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            // } else {
-            //     JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
-            // }
-
-            JOptionPane.showMessageDialog(this, "Función de conexión BD en desarrollo", 
-                "Info", JOptionPane.INFORMATION_MESSAGE);
+            // BLOQUE: Probar base de datos
+            // Para: Confirmar si la aplicacion puede conectarse con MySQL.
+            boolean conectado = conexionBD.probarConexion();
+            if (conectado) {
+                JOptionPane.showMessageDialog(this, "Conexión exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         JPanel bdPanel = new JPanel();

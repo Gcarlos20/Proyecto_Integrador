@@ -1,19 +1,17 @@
 package controller;
 
 import model.producto;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * CONTROLADOR: Inventario Controller
  * Descripción: Gestiona estadísticas y estado general del inventario
  * Funcionalidades: Obtener totales, estadísticas, alertas de stock
- * Nota: Conectar a base de datos en los métodos comentados
  */
 public class InventarioController {
 
-    private productoController productoController;
-    private MovimientoController movimientoController;
+    private final productoController productoController;
+    private final MovimientoController movimientoController;
 
     public InventarioController() {
         this.productoController = new productoController();
@@ -27,10 +25,6 @@ public class InventarioController {
      */
     public Object[] obtenerEstadisticas() {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "SELECT COUNT(*), SUM(stock), SUM(precio * stock) FROM productos";
-            // return db.obtenerEstadisticas(query);
-
             int totalProductos = productoController.listar().size();
             int cantidadTotal = productoController.obtenerCantidadTotal();
             double valorTotal = productoController.obtenerValorTotal();
@@ -75,8 +69,9 @@ public class InventarioController {
      */
     public int obtenerProductoMasVendido() {
         try {
-            List<Integer> contador = new ArrayList<>();
-            
+            int maxId = -1;
+            int maxSalidas = 0;
+
             for (producto p : productoController.listar()) {
                 int salidas = 0;
                 for (var m : movimientoController.obtenerPorProducto(p.getId())) {
@@ -84,20 +79,13 @@ public class InventarioController {
                         salidas += m.getCantidad();
                     }
                 }
-                
-                if (!contador.isEmpty()) {
-                    int maxId = 0;
-                    int maxSalidas = 0;
-                    for (int i = 0; i < contador.size(); i += 2) {
-                        if (contador.get(i + 1) > maxSalidas) {
-                            maxSalidas = contador.get(i + 1);
-                            maxId = contador.get(i);
-                        }
-                    }
-                    return maxId;
+
+                if (salidas > maxSalidas) {
+                    maxSalidas = salidas;
+                    maxId = p.getId();
                 }
             }
-            return -1;
+            return maxId;
         } catch (Exception e) {
             System.out.println("Error al obtener producto más vendido: " + e.getMessage());
             return -1;
@@ -111,13 +99,13 @@ public class InventarioController {
      */
     public double obtenerRotacionInventario() {
         try {
-            // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-            // String query = "SELECT SUM(cantidad) FROM movimientos WHERE tipo = 'SALIDA' AND MONTH(fecha) = MONTH(NOW())";
-            // int ventasDelMes = db.obtenerValor(query);
-            // double costoPromedio = obtenerValorTotal() / listar().size();
-            // return ventasDelMes / costoPromedio;
+            int salidas = 0;
+            for (var movimiento : movimientoController.obtenerPorTipo("SALIDA")) {
+                salidas += movimiento.getCantidad();
+            }
 
-            return 0.0;
+            double valorInventario = obtenerValorInventario();
+            return valorInventario == 0 ? 0.0 : salidas / valorInventario;
         } catch (Exception e) {
             System.out.println("Error al calcular rotación: " + e.getMessage());
             return 0.0;

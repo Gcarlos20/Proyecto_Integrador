@@ -1,5 +1,8 @@
 package vista;
 
+import controller.MovimientoController;
+import controller.ProveedorController;
+import controller.productoController;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -11,6 +14,10 @@ import java.awt.*;
  * Características: Rango de fechas, exportación de datos
  */
 public class ReporteVista extends JFrame {
+
+    private final productoController productoController = new productoController();
+    private final MovimientoController movimientoController = new MovimientoController();
+    private final ProveedorController proveedorController = new ProveedorController();
 
     public ReporteVista() {
         setTitle("Reportes");
@@ -167,13 +174,10 @@ public class ReporteVista extends JFrame {
      * Para: Exportar estado actual del inventario
      */
     private void generarReporteStock() {
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // List<producto> productos = controller.obtenerTodos();
-        // File archivo = ExportarPDF.generarReporteStock(productos);
-        // Desktop.getDesktop().open(archivo);
+        int totalProductos = productoController.listar().size();
 
         JOptionPane.showMessageDialog(this, 
-            "Reporte de Stock generado y descargado", 
+            "Reporte de Stock generado con " + totalProductos + " productos", 
             "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -182,13 +186,10 @@ public class ReporteVista extends JFrame {
      * Para: Exportar historial de movimientos
      */
     private void generarReporteMovimientos() {
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // List<movimiento> movimientos = controller.obtenerMovimientos();
-        // File archivo = ExportarPDF.generarReporteMovimientos(movimientos);
-        // Desktop.getDesktop().open(archivo);
+        int totalMovimientos = movimientoController.obtenerTodos().size();
 
         JOptionPane.showMessageDialog(this, 
-            "Reporte de Movimientos generado y descargado", 
+            "Reporte de Movimientos generado con " + totalMovimientos + " movimientos", 
             "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -197,13 +198,10 @@ public class ReporteVista extends JFrame {
      * Para: Análisis de proveedores
      */
     private void generarReporteProveedores() {
-        // BLOQUE DE BASE DE DATOS (COMENTADO - DESCOMENTAR CUANDO SE CONECTE BD)
-        // List<proveedor> proveedores = controller.obtenerProveedores();
-        // File archivo = ExportarPDF.generarReporteProveedores(proveedores);
-        // Desktop.getDesktop().open(archivo);
+        int totalProveedores = proveedorController.obtenerTodos().size();
 
         JOptionPane.showMessageDialog(this, 
-            "Reporte de Proveedores generado y descargado", 
+            "Reporte de Proveedores generado con " + totalProveedores + " proveedores", 
             "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -212,7 +210,8 @@ public class ReporteVista extends JFrame {
      * Para: Crear reporte con filtros personalizados
      */
     private void generarReportePersonalizado() {
-        // Aquí iría una vista para seleccionar parámetros del reporte
+        // BLOQUE: Reporte personalizado
+        // Para: Reservar el punto donde se agregaran filtros avanzados.
         JOptionPane.showMessageDialog(this, 
             "Función de reporte personalizado en desarrollo", 
             "Info", JOptionPane.INFORMATION_MESSAGE);

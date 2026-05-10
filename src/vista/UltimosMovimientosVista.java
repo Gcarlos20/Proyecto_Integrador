@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * VISTA: Últimos Movimientos
  * Descripción: Muestra el historial de movimientos recientes del inventario
- * Funcionalidades: Ver entradas, salidas y ajustes de stock
+ * Funcionalidades: Ver entradas, salidas y ajustes de cantidad
  * Características: Filtrado por tipo, búsqueda, ordenamiento
  */
 public class UltimosMovimientosVista extends JFrame {
@@ -88,7 +88,7 @@ public class UltimosMovimientosVista extends JFrame {
         tablePanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
         DefaultTableModel modelo = new DefaultTableModel(
-            new String[]{"ID", "Producto", "Tipo", "Cantidad", "Fecha", "Usuario", "Observaciones"}, 0
+            new String[]{"ID Movimiento", "ID Producto", "Tipo", "Cantidad", "Fecha", "Usuario", "Observaciones"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {

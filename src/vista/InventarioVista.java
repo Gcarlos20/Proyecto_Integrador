@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * VISTA: Inventario General
  * Descripción: Muestra el estado actual del inventario con cantidades totales
- * Funcionalidades: Ver stock total, cantidad de productos, valor total del inventario
+ * Funcionalidades: Ver cantidad total, cantidad de productos, valor total del inventario
  * Características: Diseño responsive, estadísticas en tiempo real
  */
 public class InventarioVista extends JFrame {
@@ -74,9 +74,9 @@ public class InventarioVista extends JFrame {
 
         Object[] estadisticas = inventarioController.obtenerEstadisticas();
         statsPanel.add(crearTarjetaEstadistica("Total Productos", String.valueOf(estadisticas[0]), new Color(70, 150, 220)));
-        statsPanel.add(crearTarjetaEstadistica("Stock Total", estadisticas[1] + " unidades", new Color(100, 180, 120)));
+        statsPanel.add(crearTarjetaEstadistica("Cantidad Total", estadisticas[1] + " unidades", new Color(100, 180, 120)));
         statsPanel.add(crearTarjetaEstadistica("Valor Inventario", "$" + String.format("%.2f", estadisticas[2]), new Color(220, 150, 70)));
-        statsPanel.add(crearTarjetaEstadistica("Bajo Stock", inventarioController.obtenerAlertasStock(10) + " productos", new Color(220, 100, 80)));
+        statsPanel.add(crearTarjetaEstadistica("Cantidad Baja", inventarioController.obtenerAlertasStock(10) + " productos", new Color(220, 100, 80)));
 
         centerPanel.add(statsPanel, BorderLayout.NORTH);
 
@@ -88,7 +88,7 @@ public class InventarioVista extends JFrame {
 
         // Tabla de inventario
         DefaultTableModel modelo = new DefaultTableModel(
-            new String[]{"ID", "Producto", "Stock", "Precio", "Valor Total", "Estado"}, 0
+            new String[]{"ID Producto", "Nombre", "Cantidad", "Precio", "Valor Total", "Estado"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -105,13 +105,13 @@ public class InventarioVista extends JFrame {
         tabla.getTableHeader().setForeground(Color.WHITE);
 
         // BLOQUE: Cargar inventario
-        // Para: Mostrar productos reales con su valor total y estado de stock.
+        // Para: Mostrar productos reales con su valor total y estado de cantidad.
         List<producto> productos = productoController.listar();
         for (producto p : productos) {
-            int stock = p.getStock();
-            String estado = stock <= 10 ? "Bajo Stock" : stock <= 50 ? "Normal" : "Alto";
-            modelo.addRow(new Object[]{p.getId(), p.getNombre(), stock, p.getPrecio(),
-                stock * p.getPrecio(), estado});
+            int cantidad = p.getStock();
+            String estado = cantidad <= 10 ? "Cantidad Baja" : cantidad <= 50 ? "Normal" : "Alto";
+            modelo.addRow(new Object[]{p.getId(), p.getNombre(), cantidad, p.getPrecio(),
+                cantidad * p.getPrecio(), estado});
         }
 
         JScrollPane scroll = new JScrollPane(tabla);

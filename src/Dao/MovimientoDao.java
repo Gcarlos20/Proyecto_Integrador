@@ -16,8 +16,9 @@ public class MovimientoDao {
     // BLOQUE: Registrar movimiento
     // Para: Guardar el movimiento y ajustar el stock del producto en una transaccion.
     public boolean registrar(int productoId, String tipo, int cantidad, String usuario, String observaciones) {
-        String insertar = "INSERT INTO movimientos (id_producto, tipo, cantidad, fecha, usuario, observaciones) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String insertar = "INSERT INTO MOVIMIENTOS "
+        + "(ID_PRODUCTO, ID_USUARIO, CANTIDAD, FECHA, DESCRIPCION, ESTADO, ID_VENTA) "
+        + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         String actualizarStock = "UPDATE productos SET cantidad = cantidad + ? WHERE id_producto = ?";
 
         try (Connection conn = conexionBD.getConexion()) {
@@ -32,6 +33,8 @@ public class MovimientoDao {
                 psMovimiento.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
                 psMovimiento.setString(5, usuario);
                 psMovimiento.setString(6, observaciones);
+                psMovimiento.setString(7, "activo"); // Valor predeterminado para ESTADO
+                psMovimiento.setNull(8, java.sql.Types.INTEGER); // ID_VENTA es nulo por defecto
                 psMovimiento.executeUpdate();
 
                 psStock.setInt(1, calcularDelta(tipo, cantidad));
@@ -58,8 +61,10 @@ public class MovimientoDao {
     // Para: Obtener el historial completo del inventario.
     public List<movimiento> obtenerTodos() {
         List<movimiento> lista = new ArrayList<>();
-        String sql = "SELECT id_movimiento, id_producto, tipo, cantidad, fecha, usuario, observaciones "
-                + "FROM movimientos ORDER BY fecha DESC, id_movimiento DESC";
+     String sql = "SELECT ID_MOVIMIENTO, ID_PRODUCTO,TIPO_MOVIMIENTO, ID_USUARIO, "
+           + "CANTIDAD, FECHA, DESCRIPCION, ESTADO, ID_VENTA "
+           + "FROM MOVIMIENTOS "
+           + "ORDER BY FECHA DESC, ID_MOVIMIENTO DESC LIMIT ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -78,8 +83,9 @@ public class MovimientoDao {
     // Para: Consultar los ultimos registros del historial.
     public List<movimiento> obtenerRecientes(int limite) {
         List<movimiento> lista = new ArrayList<>();
-        String sql = "SELECT id_movimiento, id_producto, tipo, cantidad, fecha, usuario, observaciones "
-                + "FROM movimientos ORDER BY fecha DESC, id_movimiento DESC LIMIT ?";
+        String sql ="SELECT ID_MOVIMIENTO, ID_PRODUCTO, TIPO_MOVIMIENTO, CANTIDAD, FECHA, ID_USUARIO, DESCRIPCION, ESTADO, ID_VENTA "
+           + "FROM MOVIMIENTOS "
+           + "ORDER BY FECHA DESC, ID_MOVIMIENTO DESC LIMIT ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -104,15 +110,15 @@ public class MovimientoDao {
 
     // BLOQUE: Filtrar por tipo
     // Para: Consultar entradas, salidas o ajustes.
-    public List<movimiento> obtenerPorTipo(String tipo) {
+    public List<movimiento> obtenerPorTipo(String TIPO_MOVIMIENTO) {
         List<movimiento> lista = new ArrayList<>();
-        String sql = "SELECT id_movimiento, id_producto, tipo, cantidad, fecha, usuario, observaciones "
-                + "FROM movimientos WHERE tipo = ? ORDER BY fecha DESC, id_movimiento DESC";
+        String sql = "SELECT ID_MOVIMIENTO, ID_PRODUCTO, TIPO_MOVIMIENTO, CANTIDAD, FECHA, ID_USUARIO, DESCRIPCION "
+                + "FROM MOVIMIENTOS WHERE TIPO_MOVIMIENTO = ? ORDER BY FECHA DESC, ID_MOVIMIENTO DESC";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, tipo);
+            ps.setString(1, TIPO_MOVIMIENTO);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(mapearMovimiento(rs));
@@ -128,10 +134,10 @@ public class MovimientoDao {
     // Para: Calcular el efecto neto de todos los movimientos de un producto.
     public int calcularSaldo(int productoId) {
         String sql = "SELECT COALESCE(SUM(CASE "
-                + "WHEN tipo = 'ENTRADA' THEN cantidad "
-                + "WHEN tipo = 'SALIDA' THEN -cantidad "
+                + "WHEN TIPO_MOVIMIENTO = 'ENTRADA' THEN cantidad "
+                + "WHEN TIPO_MOVIMIENTO = 'SALIDA' THEN -cantidad "
                 + "ELSE cantidad END), 0) AS saldo "
-                + "FROM movimientos WHERE id_producto = ?";
+                + "FROM MOVIMIENTOS WHERE id_producto = ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -152,8 +158,8 @@ public class MovimientoDao {
     // Para: Evitar repetir mapeo en filtros simples por entero.
     private List<movimiento> filtrar(String condicion, int valor) {
         List<movimiento> lista = new ArrayList<>();
-        String sql = "SELECT id_movimiento, id_producto, tipo, cantidad, fecha, usuario, observaciones "
-                + "FROM movimientos WHERE " + condicion + " ORDER BY fecha DESC, id_movimiento DESC";
+        String sql = "SELECT ID_MOVIMIENTO, ID_PRODUCTO, TIPO_MOVIMIENTO, CANTIDAD, FECHA, ID_USUARIO, DESCRIPCION "
+                + "FROM MOVIMIENTOS WHERE " + condicion + " ORDER BY FECHA DESC, ID_MOVIMIENTO DESC";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -172,8 +178,8 @@ public class MovimientoDao {
 
     // BLOQUE: Calcular cambio de stock
     // Para: Convertir el tipo de movimiento en suma o resta de inventario.
-    private int calcularDelta(String tipo, int cantidad) {
-        if ("SALIDA".equalsIgnoreCase(tipo)) {
+    private int calcularDelta(String TIPO_MOVIMIENTO, int cantidad) {
+        if ("SALIDA".equalsIgnoreCase(TIPO_MOVIMIENTO)) {
             return -cantidad;
         }
         return cantidad;
@@ -184,13 +190,13 @@ public class MovimientoDao {
     private movimiento mapearMovimiento(ResultSet rs) throws SQLException {
         Timestamp fecha = rs.getTimestamp("fecha");
         return new movimiento(
-            rs.getInt("id_movimiento"),
-            rs.getInt("id_producto"),
-            rs.getString("tipo"),
-            rs.getInt("cantidad"),
+            rs.getInt("ID_MOVIMIENTO"),
+            rs.getInt("ID_PRODUCTO"),
+            rs.getString("TIPO_MOVIMIENTO"),
+            rs.getInt("CANTIDAD"),
             fecha == null ? LocalDateTime.now() : fecha.toLocalDateTime(),
-            rs.getString("usuario"),
-            rs.getString("observaciones")
+            rs.getString("ID_USUARIO"),
+            rs.getString("DESCRIPCION")
         );
     }
 }

@@ -14,17 +14,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
--- BLOQUE: Productos
--- Para: Guardar el catalogo y stock actual del inventario.
-CREATE TABLE IF NOT EXISTS productos (
-    id_producto INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(120) NOT NULL,
-    precio DECIMAL(12, 2) NOT NULL DEFAULT 0,
-    cantidad INT NOT NULL DEFAULT 0,
-    CONSTRAINT chk_productos_precio CHECK (precio >= 0),
-    CONSTRAINT chk_productos_cantidad CHECK (cantidad >= 0)
-);
-
 -- BLOQUE: Proveedores
 -- Para: Registrar contactos de proveedores sin borrar historial.
 CREATE TABLE IF NOT EXISTS proveedores (
@@ -35,6 +24,27 @@ CREATE TABLE IF NOT EXISTS proveedores (
     email VARCHAR(120),
     direccion VARCHAR(200),
     activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+-- BLOQUE: Productos
+-- Para: Guardar el catalogo y stock actual del inventario.
+CREATE TABLE IF NOT EXISTS productos (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(60) NOT NULL UNIQUE,
+    nombre VARCHAR(120) NOT NULL,
+    categoria VARCHAR(80),
+    descripcion VARCHAR(255),
+    precio DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    cantidad INT NOT NULL DEFAULT 0,
+    stock_minimo INT NOT NULL DEFAULT 0,
+    id_proveedor INT,
+    CONSTRAINT chk_productos_precio CHECK (precio >= 0),
+    CONSTRAINT chk_productos_cantidad CHECK (cantidad >= 0),
+    CONSTRAINT chk_productos_stock_minimo CHECK (stock_minimo >= 0),
+    CONSTRAINT fk_productos_proveedor
+        FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 -- BLOQUE: Movimientos

@@ -21,14 +21,14 @@ public class MovimientoController {
      * BLOQUE: Registrar Movimiento
      * Para: Insertar nuevo movimiento en la base de datos
      * @param productoId ID del producto
-     * @param tipo Tipo de movimiento (ENTRADA, SALIDA, AJUSTE)
+     * @param TIPO_MOVIMIENTO Tipo de movimiento (ENTRADA, SALIDA, AJUSTE)
      * @param cantidad Cantidad movida
      * @param usuario Usuario que realiza el movimiento
      * @param observaciones Notas adicionales
      */
-    public boolean registrar(int productoId, String tipo, int cantidad, String usuario, String observaciones) {
+    public boolean registrar(int productoId, String TIPO_MOVIMIENTO, int cantidad, String usuario, String observaciones) {
         try {
-            return movimientoDao.registrar(productoId, tipo, cantidad, usuario, observaciones);
+            return movimientoDao.registrar(productoId, TIPO_MOVIMIENTO, cantidad, usuario, observaciones);
         } catch (Exception e) {
             System.out.println("Error al registrar movimiento: " + e.getMessage());
             return false;

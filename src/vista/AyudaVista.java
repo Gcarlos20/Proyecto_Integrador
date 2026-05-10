@@ -164,7 +164,7 @@ public class AyudaVista extends JFrame {
         panel.setBorder(new EmptyBorder(20, 30, 20, 30));
 
         String[][] modulos = {
-            {"📦 PRODUCTOS", "Gestione el catálogo de productos con precios y stock"},
+            {"📦 PRODUCTOS", "Gestione el catálogo de productos con precios y cantidad"},
             {"📊 INVENTARIO", "Visualice el estado actual del inventario en tiempo real"},
             {"📈 REPORTES", "Genere reportes detallados del inventario y movimientos"},
             {"⏱️ MOVIMIENTOS", "Revise el historial de entradas, salidas y ajustes"},

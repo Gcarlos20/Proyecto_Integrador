@@ -10,7 +10,7 @@ import java.awt.*;
 /**
  * VISTA: Reportes
  * Descripción: Genera reportes del inventario (PDF, Excel, etc)
- * Funcionalidades: Reportes de stock, ventas, movimientos, análisis
+ * Funcionalidades: Reportes de cantidades, ventas, movimientos, análisis
  * Características: Rango de fechas, exportación de datos
  */
 public class ReporteVista extends JFrame {
@@ -67,7 +67,7 @@ public class ReporteVista extends JFrame {
 
         // BLOQUE: Reportes disponibles
         centerPanel.add(crearTarjetaReporte(
-            "Reporte de Stock",
+            "Reporte de Cantidades",
             "Estado actual del inventario",
             new Color(70, 150, 220),
             this::generarReporteStock
@@ -170,14 +170,14 @@ public class ReporteVista extends JFrame {
     // ============================================
 
     /**
-     * BLOQUE: Generar Reporte de Stock
+     * BLOQUE: Generar Reporte de Cantidades
      * Para: Exportar estado actual del inventario
      */
     private void generarReporteStock() {
         int totalProductos = productoController.listar().size();
 
         JOptionPane.showMessageDialog(this, 
-            "Reporte de Stock generado con " + totalProductos + " productos", 
+            "Reporte de Cantidades generado con " + totalProductos + " productos",
             "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 

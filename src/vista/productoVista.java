@@ -21,7 +21,7 @@ public class productoVista extends JFrame {
 
     private JTable tabla;
     private DefaultTableModel modelo;
-    private JTextField txtNombre, txtPrecio, txtStock;
+    private JTextField txtCodigo, txtNombre, txtCategoria, txtDescripcion, txtPrecio, txtCantidad, txtStockMinimo, txtProveedorId;
     private JButton btnAgregar, btnEditar, btnEliminar, btnLimpiar;
     private productoController controller = new productoController();
     private int idSeleccionado = -1;
@@ -74,12 +74,16 @@ public class productoVista extends JFrame {
 
         // Panel izquierdo - Formulario
         JPanel formPanel = crearPanelFormulario();
+        JScrollPane formScroll = new JScrollPane(formPanel);
+        formScroll.setOpaque(false);
+        formScroll.getViewport().setOpaque(false);
+        formScroll.setBorder(null);
 
         // Panel derecho - Tabla
         JPanel tablePanel = crearPanelTabla();
 
         // Dividir con JSplitPane para mejor responsividad
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tablePanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formScroll, tablePanel);
         splitPane.setOpaque(false);
         splitPane.setDividerLocation(350);
         splitPane.setResizeWeight(0.35);
@@ -93,7 +97,7 @@ public class productoVista extends JFrame {
 
     /**
      * BLOQUE: Crear Panel de Formulario
-     * Para: Ingresar datos del producto (nombre, precio, stock)
+     * Para: Ingresar datos del producto (nombre, precio, cantidad)
      */
     private JPanel crearPanelFormulario() {
         JPanel panel = new JPanel();
@@ -109,59 +113,14 @@ public class productoVista extends JFrame {
         panel.add(formTitle);
         panel.add(Box.createVerticalStrut(20));
 
-        // Campo: Nombre
-        JLabel lblNombre = new JLabel("Nombre del Producto");
-        lblNombre.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblNombre.setForeground(new Color(200, 200, 220));
-        panel.add(lblNombre);
-
-        txtNombre = new JTextField();
-        txtNombre.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtNombre.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        txtNombre.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(100, 120, 160), 1),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)
-        ));
-        txtNombre.setBackground(new Color(50, 65, 95));
-        txtNombre.setForeground(Color.WHITE);
-        panel.add(txtNombre);
-        panel.add(Box.createVerticalStrut(15));
-
-        // Campo: Precio
-        JLabel lblPrecio = new JLabel("Precio (USD)");
-        lblPrecio.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblPrecio.setForeground(new Color(200, 200, 220));
-        panel.add(lblPrecio);
-
-        txtPrecio = new JTextField();
-        txtPrecio.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtPrecio.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        txtPrecio.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(100, 120, 160), 1),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)
-        ));
-        txtPrecio.setBackground(new Color(50, 65, 95));
-        txtPrecio.setForeground(Color.WHITE);
-        panel.add(txtPrecio);
-        panel.add(Box.createVerticalStrut(15));
-
-        // Campo: Stock
-        JLabel lblStock = new JLabel("Stock (Cantidad)");
-        lblStock.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblStock.setForeground(new Color(200, 200, 220));
-        panel.add(lblStock);
-
-        txtStock = new JTextField();
-        txtStock.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtStock.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        txtStock.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(100, 120, 160), 1),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)
-        ));
-        txtStock.setBackground(new Color(50, 65, 95));
-        txtStock.setForeground(Color.WHITE);
-        panel.add(txtStock);
-        panel.add(Box.createVerticalStrut(25));
+        txtCodigo = crearCampo(panel, "Código");
+        txtNombre = crearCampo(panel, "Nombre del Producto");
+        txtCategoria = crearCampo(panel, "Categoría");
+        txtDescripcion = crearCampo(panel, "Descripción");
+        txtPrecio = crearCampo(panel, "Precio (USD)");
+        txtCantidad = crearCampo(panel, "Cantidad");
+        txtStockMinimo = crearCampo(panel, "Stock Mínimo");
+        txtProveedorId = crearCampo(panel, "ID Proveedor (opcional)");
 
         // Panel de botones
         JPanel buttonPanel = new JPanel();
@@ -184,6 +143,26 @@ public class productoVista extends JFrame {
         return panel;
     }
 
+    private JTextField crearCampo(JPanel panel, String etiqueta) {
+        JLabel label = new JLabel(etiqueta);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        label.setForeground(new Color(200, 200, 220));
+        panel.add(label);
+
+        JTextField campo = new JTextField();
+        campo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        campo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        campo.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(100, 120, 160), 1),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)
+        ));
+        campo.setBackground(new Color(50, 65, 95));
+        campo.setForeground(Color.WHITE);
+        panel.add(campo);
+        panel.add(Box.createVerticalStrut(12));
+        return campo;
+    }
+
     /**
      * BLOQUE: Crear Panel de Tabla
      * Para: Mostrar productos en tabla con scroll
@@ -201,7 +180,9 @@ public class productoVista extends JFrame {
         panel.add(tableTitle, BorderLayout.NORTH);
 
         // Tabla
-        modelo = new DefaultTableModel(new String[]{"ID", "Nombre", "Precio", "Stock"}, 0) {
+        modelo = new DefaultTableModel(
+            new String[]{"ID Producto", "Código", "Nombre", "Categoría", "Descripción", "Precio", "Cantidad", "Stock Mínimo", "ID Proveedor"}, 0
+        ) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -224,9 +205,14 @@ public class productoVista extends JFrame {
                 int fila = tabla.getSelectedRow();
                 if (fila != -1) {
                     idSeleccionado = (int) modelo.getValueAt(fila, 0);
-                    txtNombre.setText(modelo.getValueAt(fila, 1).toString());
-                    txtPrecio.setText(modelo.getValueAt(fila, 2).toString());
-                    txtStock.setText(modelo.getValueAt(fila, 3).toString());
+                    txtCodigo.setText(modelo.getValueAt(fila, 1).toString());
+                    txtNombre.setText(modelo.getValueAt(fila, 2).toString());
+                    txtCategoria.setText(valorTabla(fila, 3));
+                    txtDescripcion.setText(valorTabla(fila, 4));
+                    txtPrecio.setText(modelo.getValueAt(fila, 5).toString());
+                    txtCantidad.setText(modelo.getValueAt(fila, 6).toString());
+                    txtStockMinimo.setText(modelo.getValueAt(fila, 7).toString());
+                    txtProveedorId.setText(valorTabla(fila, 8));
                 }
             }
         });
@@ -266,6 +252,16 @@ public class productoVista extends JFrame {
         return btn;
     }
 
+    private String valorTabla(int fila, int columna) {
+        Object valor = modelo.getValueAt(fila, columna);
+        return valor == null ? "" : valor.toString();
+    }
+
+    private Integer obtenerProveedorId() {
+        String valor = txtProveedorId.getText().trim();
+        return valor.isEmpty() ? null : Integer.parseInt(valor);
+    }
+
     // ============================================
     // MÉTODOS DE LÓGICA - CRUD
     // ============================================
@@ -276,23 +272,29 @@ public class productoVista extends JFrame {
      */
     private void agregarProducto() {
         try {
-            if (txtNombre.getText().isEmpty() || txtPrecio.getText().isEmpty() || txtStock.getText().isEmpty()) {
+            if (txtCodigo.getText().isEmpty() || txtNombre.getText().isEmpty() || txtPrecio.getText().isEmpty()
+                    || txtCantidad.getText().isEmpty() || txtStockMinimo.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Por favor complete todos los campos", 
                     "Validación", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             controller.agregar(
+                    txtCodigo.getText(),
                     txtNombre.getText(),
+                    txtCategoria.getText(),
+                    txtDescripcion.getText(),
                     Double.parseDouble(txtPrecio.getText()),
-                    Integer.parseInt(txtStock.getText())
+                    Integer.parseInt(txtCantidad.getText()),
+                    Integer.parseInt(txtStockMinimo.getText()),
+                    obtenerProveedorId()
             );
             JOptionPane.showMessageDialog(this, "Producto agregado exitosamente", 
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
             cargarTabla();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Precio y Stock deben ser números", 
+            JOptionPane.showMessageDialog(this, "Precio, cantidad, stock mínimo e ID proveedor deben ser números válidos",
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -309,7 +311,8 @@ public class productoVista extends JFrame {
                 return;
             }
 
-            if (txtNombre.getText().isEmpty() || txtPrecio.getText().isEmpty() || txtStock.getText().isEmpty()) {
+            if (txtCodigo.getText().isEmpty() || txtNombre.getText().isEmpty() || txtPrecio.getText().isEmpty()
+                    || txtCantidad.getText().isEmpty() || txtStockMinimo.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Por favor complete todos los campos", 
                     "Validación", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -317,16 +320,21 @@ public class productoVista extends JFrame {
 
             controller.actualizar(
                     idSeleccionado,
+                    txtCodigo.getText(),
                     txtNombre.getText(),
+                    txtCategoria.getText(),
+                    txtDescripcion.getText(),
                     Double.parseDouble(txtPrecio.getText()),
-                    Integer.parseInt(txtStock.getText())
+                    Integer.parseInt(txtCantidad.getText()),
+                    Integer.parseInt(txtStockMinimo.getText()),
+                    obtenerProveedorId()
             );
             JOptionPane.showMessageDialog(this, "Producto actualizado exitosamente", 
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
             cargarTabla();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Precio y Stock deben ser números", 
+            JOptionPane.showMessageDialog(this, "Precio, cantidad, stock mínimo e ID proveedor deben ser números válidos",
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -361,8 +369,13 @@ public class productoVista extends JFrame {
      */
     private void limpiarCampos() {
         txtNombre.setText("");
+        txtCodigo.setText("");
+        txtCategoria.setText("");
+        txtDescripcion.setText("");
         txtPrecio.setText("");
-        txtStock.setText("");
+        txtCantidad.setText("");
+        txtStockMinimo.setText("");
+        txtProveedorId.setText("");
         idSeleccionado = -1;
         tabla.clearSelection();
     }
@@ -378,7 +391,17 @@ public class productoVista extends JFrame {
         // Para: Mostrar en la tabla los productos guardados en la base de datos.
         List<producto> productos = controller.listar();
         for (producto p : productos) {
-            modelo.addRow(new Object[]{p.getId(), p.getNombre(), p.getPrecio(), p.getStock()});
+            modelo.addRow(new Object[]{
+                p.getId(),
+                p.getCodigo(),
+                p.getNombre(),
+                p.getCategoria(),
+                p.getDescripcion(),
+                p.getPrecio(),
+                p.getStock(),
+                p.getStockMinimo(),
+                p.getProveedorId()
+            });
         }
     }
 }

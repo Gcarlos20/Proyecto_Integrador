@@ -26,8 +26,13 @@ public class productoController {
      * @param stock Stock inicial
      */
     public boolean agregar(String nombre, double precio, int stock) {
+        return agregar(null, nombre, null, null, precio, stock, 0, null);
+    }
+
+    public boolean agregar(String codigo, String nombre, String categoria, String descripcion,
+                           double precio, int stock, int stockMinimo, Integer proveedorId) {
         try {
-            return productoDao.agregar(nombre, precio, stock);
+            return productoDao.agregar(codigo, nombre, categoria, descripcion, precio, stock, stockMinimo, proveedorId);
         } catch (Exception e) {
             System.out.println("Error al agregar producto: " + e.getMessage());
             return false;
@@ -72,8 +77,13 @@ public class productoController {
      * @param stock Nuevo stock
      */
     public boolean actualizar(int id, String nombre, double precio, int stock) {
+        return actualizar(id, null, nombre, null, null, precio, stock, 0, null);
+    }
+
+    public boolean actualizar(int id, String codigo, String nombre, String categoria, String descripcion,
+                              double precio, int stock, int stockMinimo, Integer proveedorId) {
         try {
-            return productoDao.actualizar(id, nombre, precio, stock);
+            return productoDao.actualizar(id, codigo, nombre, categoria, descripcion, precio, stock, stockMinimo, proveedorId);
         } catch (Exception e) {
             System.out.println("Error al actualizar producto: " + e.getMessage());
             return false;
@@ -103,7 +113,8 @@ public class productoController {
     public List<producto> obtenerProductosConStockBajo(int minimo) {
         List<producto> stockBajo = new ArrayList<>();
         for (producto p : listar()) {
-            if (p.getStock() <= minimo) {
+            int limite = p.getStockMinimo() > 0 ? p.getStockMinimo() : minimo;
+            if (p.getStock() <= limite) {
                 stockBajo.add(p);
             }
         }

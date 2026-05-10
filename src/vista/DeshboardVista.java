@@ -109,7 +109,7 @@ public class DeshboardVista extends JFrame {
         JPanel contentPanel = new JPanel();
         contentPanel.setOpaque(false);
         contentPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
-        contentPanel.setLayout(new GridLayout(3, 2, 20, 20));
+        contentPanel.setLayout(new GridLayout(0, 2, 20, 20));
 
         // Botones de módulos
         contentPanel.add(crearBotoModulo("📦 PRODUCTOS", "Gestionar productos del inventario",
@@ -120,6 +120,9 @@ public class DeshboardVista extends JFrame {
 
         contentPanel.add(crearBotoModulo("📈 REPORTES", "Generar reportes de inventario",
                 new Color(220, 150, 70), () -> new ReporteVista().setVisible(true)));
+
+        contentPanel.add(crearBotoModulo("PROVEEDORES", "Gestionar proveedores registrados",
+                new Color(90, 150, 170), () -> new ProveedorVista().setVisible(true)));
 
         contentPanel.add(crearBotoModulo("⏱️ ÚLTIMOS MOVIMIENTOS", "Ver movimientos recientes",
                 new Color(180, 100, 150), () -> new UltimosMovimientosVista().setVisible(true)));
@@ -210,5 +213,4 @@ public class DeshboardVista extends JFrame {
         return panel;
     }
 }
-
 

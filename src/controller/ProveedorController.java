@@ -21,7 +21,7 @@ public class ProveedorController {
      * BLOQUE: Agregar Proveedor
      * Para: Insertar nuevo proveedor
      * @param nombre Nombre del proveedor
-     * @param contacto Persona de contacto
+     * @param contacto Nombre de contacto
      * @param telefono Teléfono
      * @param email Email
      * @param direccion Dirección

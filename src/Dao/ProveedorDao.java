@@ -14,7 +14,7 @@ public class ProveedorDao {
     // BLOQUE: Agregar proveedor
     // Para: Guardar un proveedor activo en la base de datos.
     public boolean agregar(String nombre, String contacto, String telefono, String email, String direccion) {
-        String sql = "INSERT INTO proveedores (nombre, contacto, telefono, email, direccion, activo) "
+        String sql = "INSERT INTO PROVEEDORES (nombre, contacto, telefono, email, direccion, activo) "
                 + "VALUES (?, ?, ?, ?, ?, TRUE)";
 
         try (Connection conn = conexionBD.getConexion();
@@ -36,8 +36,8 @@ public class ProveedorDao {
     // Para: Traer solo proveedores activos.
     public List<proveedor> obtenerTodos() {
         List<proveedor> lista = new ArrayList<>();
-        String sql = "SELECT id_proveedor, nombre, contacto, telefono, email, direccion, activo "
-                + "FROM proveedores WHERE activo = TRUE ORDER BY nombre";
+        String sql = "SELECT ID_PROVEEDORES, NOMBRE, CONTACTO, TELEFONO, CORRREO, DIRECCION, ACTIVO "
+                + "FROM PROVEEDORES WHERE activo = TRUE ORDER BY nombre";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -76,8 +76,8 @@ public class ProveedorDao {
     // BLOQUE: Actualizar proveedor
     // Para: Modificar datos principales de un proveedor.
     public boolean actualizar(int id, String nombre, String contacto, String telefono, String email, String direccion) {
-        String sql = "UPDATE proveedores SET nombre = ?, contacto = ?, telefono = ?, email = ?, direccion = ? "
-                + "WHERE id_proveedor = ?";
+        String sql = "UPDATE PROVEEDORES SET nombre = ?, contacto = ?, telefono = ?, email = ?, direccion = ? "
+                + "WHERE ID_PROVEEDOR = ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -98,7 +98,7 @@ public class ProveedorDao {
     // BLOQUE: Desactivar proveedor
     // Para: Ocultar un proveedor sin borrar su historial.
     public boolean eliminar(int id) {
-        String sql = "UPDATE proveedores SET activo = FALSE WHERE id_proveedor = ?";
+        String sql = "UPDATE PROVEEDORES SET activo = FALSE WHERE ID_PROVEEDOR = ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {

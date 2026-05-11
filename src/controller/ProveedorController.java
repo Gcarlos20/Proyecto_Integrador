@@ -21,14 +21,13 @@ public class ProveedorController {
      * BLOQUE: Agregar Proveedor
      * Para: Insertar nuevo proveedor
      * @param nombre Nombre del proveedor
-     * @param contacto Nombre de contacto
      * @param telefono Teléfono
-     * @param email Email
+     * @param correo Correo
      * @param direccion Dirección
      */
-    public boolean agregar(String nombre, String contacto, String telefono, String email, String direccion) {
+    public boolean agregar(String nombre, String telefono, String correo, String direccion) {
         try {
-            return proveedorDao.agregar(nombre, contacto, telefono, email, direccion);
+            return proveedorDao.agregar(nombre, telefono, correo, direccion);
         } catch (Exception e) {
             System.out.println("Error al agregar proveedor: " + e.getMessage());
             return false;
@@ -64,14 +63,13 @@ public class ProveedorController {
      * Para: Modificar datos de un proveedor
      * @param id ID del proveedor
      * @param nombre Nuevo nombre
-     * @param contacto Nuevo contacto
      * @param telefono Nuevo teléfono
-     * @param email Nuevo email
+     * @param correo Nuevo correo
      * @param direccion Nueva dirección
      */
-    public boolean actualizar(int id, String nombre, String contacto, String telefono, String email, String direccion) {
+    public boolean actualizar(int id, String nombre, String telefono, String correo, String direccion) {
         try {
-            return proveedorDao.actualizar(id, nombre, contacto, telefono, email, direccion);
+            return proveedorDao.actualizar(id, nombre, telefono, correo, direccion);
         } catch (Exception e) {
             System.out.println("Error al actualizar proveedor: " + e.getMessage());
             return false;
@@ -80,7 +78,7 @@ public class ProveedorController {
 
     /**
      * BLOQUE: Eliminar Proveedor
-     * Para: Desactivar un proveedor (soft delete)
+     * Para: Eliminar un proveedor
      * @param id ID del proveedor
      */
     public boolean eliminar(int id) {

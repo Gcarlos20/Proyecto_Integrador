@@ -201,7 +201,7 @@ public class AyudaVista extends JFrame {
 
         panel.add(crearTitulo("Contacto de Soporte"));
         panel.add(crearLineaContacto("📧 Email", "soporte@inventario.com"));
-        panel.add(crearLineaContacto("📞 Teléfono", "+34 912 345 678"));
+        panel.add(crearLineaContacto("📞 Teléfono", "+57: 310 658 6822"));
         panel.add(crearLineaContacto("🌐 Sitio Web", "www.inventario.com"));
         panel.add(Box.createVerticalStrut(30));
 

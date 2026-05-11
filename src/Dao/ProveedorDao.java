@@ -12,19 +12,18 @@ import java.util.List;
 public class ProveedorDao {
 
     // BLOQUE: Agregar proveedor
-    // Para: Guardar un proveedor activo en la base de datos.
-    public boolean agregar(String nombre, String contacto, String telefono, String email, String direccion) {
-        String sql = "INSERT INTO PROVEEDORES (nombre, contacto, telefono, email, direccion, activo) "
-                + "VALUES (?, ?, ?, ?, ?, TRUE)";
+    // Para: Guardar un proveedor en la base de datos.
+    public boolean agregar(String nombre, String telefono, String correo, String direccion) {
+        String sql = "INSERT INTO PROVEEDORES (NOMBRE, TELEFONO, CORREO, DIRECCION) "
+                + "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, nombre);
-            ps.setString(2, contacto);
-            ps.setString(3, telefono);
-            ps.setString(4, email);
-            ps.setString(5, direccion);
+            ps.setString(2, telefono);
+            ps.setString(3, correo);
+            ps.setString(4, direccion);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error al agregar proveedor: " + e.getMessage());
@@ -33,11 +32,11 @@ public class ProveedorDao {
     }
 
     // BLOQUE: Listar proveedores
-    // Para: Traer solo proveedores activos.
+    // Para: Traer proveedores existentes.
     public List<proveedor> obtenerTodos() {
         List<proveedor> lista = new ArrayList<>();
-        String sql = "SELECT ID_PROVEEDORES, NOMBRE, CONTACTO, TELEFONO, CORRREO, DIRECCION, ACTIVO "
-                + "FROM PROVEEDORES WHERE activo = TRUE ORDER BY nombre";
+        String sql = "SELECT ID_PROVEEDOR, NOMBRE, TELEFONO, CORREO, DIRECCION "
+                + "FROM PROVEEDORES ORDER BY nombre";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -55,8 +54,8 @@ public class ProveedorDao {
     // BLOQUE: Buscar proveedor
     // Para: Obtener un proveedor por su ID.
     public proveedor obtenerPorId(int id) {
-        String sql = "SELECT id_proveedor, nombre, contacto, telefono, email, direccion, activo "
-                + "FROM proveedores WHERE id_proveedor = ?";
+        String sql = "SELECT ID_PROVEEDOR, NOMBRE, TELEFONO, CORREO, DIRECCION "
+                + "FROM PROVEEDORES WHERE ID_PROVEEDOR = ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -75,19 +74,18 @@ public class ProveedorDao {
 
     // BLOQUE: Actualizar proveedor
     // Para: Modificar datos principales de un proveedor.
-    public boolean actualizar(int id, String nombre, String contacto, String telefono, String email, String direccion) {
-        String sql = "UPDATE PROVEEDORES SET nombre = ?, contacto = ?, telefono = ?, email = ?, direccion = ? "
+    public boolean actualizar(int id, String nombre, String telefono, String correo, String direccion) {
+        String sql = "UPDATE PROVEEDORES SET NOMBRE = ?, TELEFONO = ?, CORREO = ?, DIRECCION = ? "
                 + "WHERE ID_PROVEEDOR = ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, nombre);
-            ps.setString(2, contacto);
-            ps.setString(3, telefono);
-            ps.setString(4, email);
-            ps.setString(5, direccion);
-            ps.setInt(6, id);
+            ps.setString(2, telefono);
+            ps.setString(3, correo);
+            ps.setString(4, direccion);
+            ps.setInt(5, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error al actualizar proveedor: " + e.getMessage());
@@ -95,10 +93,10 @@ public class ProveedorDao {
         }
     }
 
-    // BLOQUE: Desactivar proveedor
-    // Para: Ocultar un proveedor sin borrar su historial.
+    // BLOQUE: Eliminar proveedor
+    // Para: Eliminar un proveedor de la base de datos.
     public boolean eliminar(int id) {
-        String sql = "UPDATE PROVEEDORES SET activo = FALSE WHERE ID_PROVEEDOR = ?";
+        String sql = "DELETE FROM PROVEEDORES WHERE ID_PROVEEDOR = ?";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -112,11 +110,11 @@ public class ProveedorDao {
     }
 
     // BLOQUE: Buscar por nombre
-    // Para: Filtrar proveedores desde la base de datos.
+    // Para: Filtrar proveedores por nombre.
     public List<proveedor> buscarPorNombre(String nombre) {
         List<proveedor> lista = new ArrayList<>();
-        String sql = "SELECT id_proveedor, nombre, contacto, telefono, email, direccion, activo "
-                + "FROM proveedores WHERE activo = TRUE AND LOWER(nombre) LIKE LOWER(?) ORDER BY nombre";
+        String sql = "SELECT ID_PROVEEDOR, NOMBRE, TELEFONO, CORREO, DIRECCION "
+                + "FROM PROVEEDORES WHERE LOWER(NOMBRE) LIKE LOWER(?) ORDER BY NOMBRE";
 
         try (Connection conn = conexionBD.getConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -139,11 +137,9 @@ public class ProveedorDao {
         return new proveedor(
             rs.getInt("id_proveedor"),
             rs.getString("nombre"),
-            rs.getString("contacto"),
             rs.getString("telefono"),
-            rs.getString("email"),
-            rs.getString("direccion"),
-            rs.getBoolean("activo")
+            rs.getString("correo"),
+            rs.getString("direccion")
         );
     }
 }

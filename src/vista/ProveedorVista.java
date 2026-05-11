@@ -19,7 +19,7 @@ public class ProveedorVista extends JFrame {
 
     private JTable tabla;
     private DefaultTableModel modelo;
-    private JTextField txtNombre, txtContacto, txtTelefono, txtEmail, txtDireccion;
+    private JTextField txtNombre, txtTelefono, txtCorreo, txtDireccion;
     private final ProveedorController controller = new ProveedorController();
     private int idSeleccionado = -1;
 
@@ -84,9 +84,8 @@ public class ProveedorVista extends JFrame {
         panel.add(Box.createVerticalStrut(20));
 
         txtNombre = crearCampo(panel, "Nombre");
-        txtContacto = crearCampo(panel, "Contacto");
         txtTelefono = crearCampo(panel, "Telefono");
-        txtEmail = crearCampo(panel, "Email");
+        txtCorreo = crearCampo(panel, "Correo");
         txtDireccion = crearCampo(panel, "Direccion");
 
         JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
@@ -133,7 +132,7 @@ public class ProveedorVista extends JFrame {
         panel.add(tableTitle, BorderLayout.NORTH);
 
         modelo = new DefaultTableModel(
-            new String[]{"ID Proveedor", "Nombre", "Contacto", "Telefono", "Email", "Direccion", "Activo"}, 0
+            new String[]{"ID Proveedor", "Nombre", "Telefono", "Correo", "Direccion"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -156,10 +155,9 @@ public class ProveedorVista extends JFrame {
                 if (fila != -1) {
                     idSeleccionado = (int) modelo.getValueAt(fila, 0);
                     txtNombre.setText(String.valueOf(modelo.getValueAt(fila, 1)));
-                    txtContacto.setText(String.valueOf(modelo.getValueAt(fila, 2)));
-                    txtTelefono.setText(String.valueOf(modelo.getValueAt(fila, 3)));
-                    txtEmail.setText(String.valueOf(modelo.getValueAt(fila, 4)));
-                    txtDireccion.setText(String.valueOf(modelo.getValueAt(fila, 5)));
+                    txtTelefono.setText(String.valueOf(modelo.getValueAt(fila, 2)));
+                    txtCorreo.setText(String.valueOf(modelo.getValueAt(fila, 3)));
+                    txtDireccion.setText(String.valueOf(modelo.getValueAt(fila, 4)));
                 }
             }
         });
@@ -205,9 +203,8 @@ public class ProveedorVista extends JFrame {
 
         controller.agregar(
                 txtNombre.getText().trim(),
-                txtContacto.getText().trim(),
                 txtTelefono.getText().trim(),
-                txtEmail.getText().trim(),
+                txtCorreo.getText().trim(),
                 txtDireccion.getText().trim()
         );
         JOptionPane.showMessageDialog(this, "Proveedor agregado exitosamente",
@@ -231,9 +228,8 @@ public class ProveedorVista extends JFrame {
         controller.actualizar(
                 idSeleccionado,
                 txtNombre.getText().trim(),
-                txtContacto.getText().trim(),
                 txtTelefono.getText().trim(),
-                txtEmail.getText().trim(),
+                txtCorreo.getText().trim(),
                 txtDireccion.getText().trim()
         );
         JOptionPane.showMessageDialog(this, "Proveedor actualizado exitosamente",
@@ -263,9 +259,8 @@ public class ProveedorVista extends JFrame {
 
     private void limpiarCampos() {
         txtNombre.setText("");
-        txtContacto.setText("");
         txtTelefono.setText("");
-        txtEmail.setText("");
+        txtCorreo.setText("");
         txtDireccion.setText("");
         idSeleccionado = -1;
         tabla.clearSelection();
@@ -278,11 +273,9 @@ public class ProveedorVista extends JFrame {
             modelo.addRow(new Object[]{
                 p.getId(),
                 p.getNombre(),
-                p.getContacto(),
                 p.getTelefono(),
-                p.getEmail(),
-                p.getDireccion(),
-                p.isActivo()
+                p.getCorreo(),
+                p.getDireccion()
             });
         }
     }

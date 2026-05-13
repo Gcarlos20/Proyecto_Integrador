@@ -68,5 +68,6 @@ CREATE TABLE IF NOT EXISTS movimientos (
 INSERT INTO usuarios (nombre, contrasena, rol)
 VALUES
     ('admin', 'admin123', 'admin'),
-    ('user1', 'password1', 'usuario')
+    ('user1', 'password1', 'usuario'),
+    ('consultor', 'consultor123', 'consultor')
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);

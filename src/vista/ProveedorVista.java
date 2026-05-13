@@ -2,6 +2,7 @@ package vista;
 
 import controller.ProveedorController;
 import model.proveedor;
+import util.Permisos;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -24,6 +25,15 @@ public class ProveedorVista extends JFrame {
     private int idSeleccionado = -1;
 
     public ProveedorVista() {
+        // BLOQUE: Permiso de proveedores
+        // Para: Evitar cambios en datos maestros si el rol no es administrador.
+        if (!Permisos.puedeGestionarProveedores()) {
+            JOptionPane.showMessageDialog(this, "Solo el rol admin puede gestionar proveedores",
+                    "Permiso denegado", JOptionPane.WARNING_MESSAGE);
+            dispose();
+            return;
+        }
+
         setTitle("Gestion de Proveedores");
         setSize(1100, 650);
         setLocationRelativeTo(null);

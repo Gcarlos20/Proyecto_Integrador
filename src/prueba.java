@@ -13,7 +13,7 @@ public class prueba {
 
         try {
 
-            // Crear PDF
+            // Crear PDF y establecer destino
             PdfWriter.getInstance(
                     documento,
                     new FileOutputStream("reporte_inventario.pdf")

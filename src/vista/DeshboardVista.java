@@ -1,6 +1,7 @@
 package vista;
 
 import util.session;
+import util.Permisos;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -9,7 +10,7 @@ import java.awt.*;
 /**
  * VISTA: Dashboard Principal
  * Descripción: Panel principal donde el usuario accede a todos los módulos del sistema
- * Módulos: Productos, Inventario, Reportes, Últimos Movimientos, Configuración, Ayuda
+ * Módulos: Productos, Inventario, Compra, Reportes, Últimos Movimientos, Configuración, Ayuda
  * Características: Diseño responsive, botones modernos, información del usuario
  */
 public class DeshboardVista extends JFrame {
@@ -112,26 +113,30 @@ public class DeshboardVista extends JFrame {
         contentPanel.setLayout(new GridLayout(0, 2, 20, 20));
 
         // Botones de módulos
+        // Para: Abrir cada seccion y respetar los permisos del rol actual.
         contentPanel.add(crearBotoModulo("📦 PRODUCTOS", "Gestionar productos del inventario",
-                new Color(70, 150, 220), () -> new productoVista().setVisible(true)));
+                new Color(70, 150, 220), Permisos.puedeVerReportes(), () -> new productoVista().setVisible(true)));
 
         contentPanel.add(crearBotoModulo("📊 INVENTARIO", "Ver estado actual del inventario",
-                new Color(100, 180, 120), () -> new InventarioVista().setVisible(true)));
+                new Color(100, 180, 120), true, () -> new InventarioVista().setVisible(true)));
+
+        contentPanel.add(crearBotoModulo("🛒 COMPRA", "Comprar productos y ver compras/ventas",
+                new Color(80, 165, 185), true, () -> new CompraVista().setVisible(true)));
 
         contentPanel.add(crearBotoModulo("📈 REPORTES", "Generar reportes de inventario",
-                new Color(220, 150, 70), () -> new ReporteVista().setVisible(true)));
+                new Color(220, 150, 70), Permisos.puedeVerReportes(), () -> new ReporteVista().setVisible(true)));
 
         contentPanel.add(crearBotoModulo("PROVEEDORES", "Gestionar proveedores registrados",
-                new Color(90, 150, 170), () -> new ProveedorVista().setVisible(true)));
+                new Color(90, 150, 170), Permisos.puedeGestionarProveedores(), () -> new ProveedorVista().setVisible(true)));
 
         contentPanel.add(crearBotoModulo("⏱️ ÚLTIMOS MOVIMIENTOS", "Ver movimientos recientes",
-                new Color(180, 100, 150), () -> new UltimosMovimientosVista().setVisible(true)));
+                new Color(180, 100, 150), true, () -> new UltimosMovimientosVista().setVisible(true)));
 
         contentPanel.add(crearBotoModulo("⚙️ CONFIGURACIÓN", "Configurar sistema y ajustes",
-                new Color(150, 120, 180), () -> new ConfiguracionVista().setVisible(true)));
+                new Color(150, 120, 180), Permisos.esAdmin(), () -> new ConfiguracionVista().setVisible(true)));
 
         contentPanel.add(crearBotoModulo("❓ AYUDA", "Ver documentación y soporte",
-                new Color(100, 140, 180), () -> new AyudaVista().setVisible(true)));
+                new Color(100, 140, 180), true, () -> new AyudaVista().setVisible(true)));
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
@@ -158,7 +163,7 @@ public class DeshboardVista extends JFrame {
      * Método auxiliar para crear botones de módulos
      * Parámetros: título, descripción, color de fondo, acción
      */
-    private JPanel crearBotoModulo(String titulo, String descripcion, Color color, Runnable action) {
+    private JPanel crearBotoModulo(String titulo, String descripcion, Color color, boolean habilitado, Runnable action) {
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -171,14 +176,15 @@ public class DeshboardVista extends JFrame {
                 g2d.fillRoundRect(3, 3, getWidth() - 6, getHeight() - 6, 15, 15);
                 
                 // Fondo principal
-                g2d.setColor(color);
+                // Para: Mostrar mas oscuro el modulo cuando el rol no tiene acceso.
+                g2d.setColor(habilitado ? color : new Color(90, 95, 110));
                 g2d.fillRoundRect(0, 0, getWidth() - 3, getHeight() - 3, 15, 15);
             }
         };
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setCursor(new Cursor(habilitado ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
         JLabel titleLabel = new JLabel(titulo);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -199,18 +205,24 @@ public class DeshboardVista extends JFrame {
         // Efecto hover
         panel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                panel.setCursor(new Cursor(habilitado ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
                 panel.repaint();
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 panel.repaint();
             }
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                action.run();
+                if (habilitado) {
+                    action.run();
+                } else {
+                    JOptionPane.showMessageDialog(panel,
+                            "Su rol no tiene permiso para usar esta seccion",
+                            "Permiso denegado",
+                            JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
 
         return panel;
     }
 }
-

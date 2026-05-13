@@ -2,6 +2,7 @@ package vista;
 
 import controller.productoController;
 import model.producto;
+import util.Permisos;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -92,6 +93,7 @@ public class productoVista extends JFrame {
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
         add(mainPanel);
+        aplicarPermisos();
         cargarTabla();
     }
 
@@ -265,6 +267,25 @@ public class productoVista extends JFrame {
     // ============================================
     // MÉTODOS DE LÓGICA - CRUD
     // ============================================
+
+    /**
+     * BLOQUE: Aplicar permisos
+     * Para: Permitir al consultor ver productos sin agregar, editar o eliminar.
+     */
+    private void aplicarPermisos() {
+        boolean puedeEditar = Permisos.puedeGestionarProductos();
+        btnAgregar.setEnabled(puedeEditar);
+        btnEditar.setEnabled(puedeEditar);
+        btnEliminar.setEnabled(puedeEditar);
+        txtCodigo.setEnabled(puedeEditar);
+        txtNombre.setEnabled(puedeEditar);
+        txtCategoria.setEnabled(puedeEditar);
+        txtDescripcion.setEnabled(puedeEditar);
+        txtPrecio.setEnabled(puedeEditar);
+        txtCantidad.setEnabled(puedeEditar);
+        txtStockMinimo.setEnabled(puedeEditar);
+        txtProveedorId.setEnabled(puedeEditar);
+    }
 
     /**
      * BLOQUE: Agregar Producto

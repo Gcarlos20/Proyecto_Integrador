@@ -167,9 +167,9 @@ public class LoginVista extends JFrame {
         LoginController controller = new LoginController();
 
         btnLogin.addActionListener(e -> {
-            String user = txtUser.getText();
-            String pass = new String(txtPass.getPassword());
-            String rolSeleccionado = (String) cbRol.getSelectedItem();
+            String user = txtUser.getText().trim();
+            String pass = new String(txtPass.getPassword()).trim();
+            String rolSeleccionado = ((String) cbRol.getSelectedItem()).trim().toLowerCase();
 
             Usuario u = controller.login(user, pass, rolSeleccionado);
 

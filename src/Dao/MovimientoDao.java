@@ -11,10 +11,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO: Movimiento
+ * Para: Gestionar el historial de movimientos del inventario (entradas, salidas, ajustes).
+ * Operaciones CRUD:
+ * - Create: registrar() - Inserta un nuevo movimiento y actualiza stock.
+ * - Read: obtenerTodos(), obtenerRecientes(), obtenerPorProducto(), obtenerPorTipo(), calcularSaldo() - Consultas de movimientos.
+ */
 public class MovimientoDao {
 
-    // BLOQUE: Registrar movimiento
-    // Para: Guardar el movimiento y ajustar el stock del producto en una transaccion.
+    /**
+     * CRUD - CREATE: Registrar movimiento
+     * Para: Guardar el movimiento y ajustar el stock del producto en una transaccion.
+     */
     public boolean registrar(int productoId, String tipo, int cantidad, String usuario, String observaciones) {
         String insertar = "INSERT INTO MOVIMIENTOS "
         + "(ID_PRODUCTO, ID_USUARIO, CANTIDAD, FECHA, DESCRIPCION, ESTADO, ID_VENTA) "
@@ -57,8 +66,10 @@ public class MovimientoDao {
         }
     }
 
-    // BLOQUE: Listar movimientos
-    // Para: Obtener el historial completo del inventario.
+    /**
+     * CRUD - READ: Listar movimientos
+     * Para: Obtener el historial completo del inventario.
+     */
     public List<movimiento> obtenerTodos() {
         List<movimiento> lista = new ArrayList<>();
      String sql = "SELECT ID_MOVIMIENTO, ID_PRODUCTO,TIPO_MOVIMIENTO, ID_USUARIO, "
@@ -79,8 +90,10 @@ public class MovimientoDao {
         return lista;
     }
 
-    // BLOQUE: Movimientos recientes
-    // Para: Consultar los ultimos registros del historial.
+    /**
+     * CRUD - READ: Movimientos recientes
+     * Para: Consultar los ultimos registros del historial.
+     */
     public List<movimiento> obtenerRecientes(int limite) {
         List<movimiento> lista = new ArrayList<>();
         String sql ="SELECT ID_MOVIMIENTO, ID_PRODUCTO, TIPO_MOVIMIENTO, CANTIDAD, FECHA, ID_USUARIO, DESCRIPCION, ESTADO, ID_VENTA "
@@ -102,14 +115,18 @@ public class MovimientoDao {
         return lista;
     }
 
-    // BLOQUE: Filtrar por producto
-    // Para: Consultar el historial de un producto especifico.
+    /**
+     * CRUD - READ: Filtrar por producto
+     * Para: Consultar el historial de un producto especifico.
+     */
     public List<movimiento> obtenerPorProducto(int productoId) {
         return filtrar("id_producto = ?", productoId);
     }
 
-    // BLOQUE: Filtrar por tipo
-    // Para: Consultar entradas, salidas o ajustes.
+    /**
+     * CRUD - READ: Filtrar por tipo
+     * Para: Consultar entradas, salidas o ajustes.
+     */
     public List<movimiento> obtenerPorTipo(String TIPO_MOVIMIENTO) {
         List<movimiento> lista = new ArrayList<>();
         String sql = "SELECT ID_MOVIMIENTO, ID_PRODUCTO, TIPO_MOVIMIENTO, CANTIDAD, FECHA, ID_USUARIO, DESCRIPCION "
@@ -130,8 +147,10 @@ public class MovimientoDao {
         return lista;
     }
 
-    // BLOQUE: Saldo por producto
-    // Para: Calcular el efecto neto de todos los movimientos de un producto.
+    /**
+     * CRUD - READ: Saldo por producto
+     * Para: Calcular el efecto neto de todos los movimientos de un producto.
+     */
     public int calcularSaldo(int productoId) {
         String sql = "SELECT COALESCE(SUM(CASE "
                 + "WHEN TIPO_MOVIMIENTO = 'ENTRADA' THEN cantidad "

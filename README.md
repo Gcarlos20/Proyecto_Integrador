@@ -26,30 +26,6 @@ Este proyecto es un sistema de gestión de inventario desarrollado en Java utili
    ```bash
    git clone https://github.com/tu-usuario/PI_Inventario.git
    cd PI_Inventario
-   ```
-
-2. **Configurar la base de datos**:
-   - Instalar MySQL
-   - Crear la base de datos ejecutando los scripts en `database/`:
-     ```bash
-     mysql -u root -p < database/schema.sql
-     mysql -u root -p < database/migracion_compras_ventas.sql
-     mysql -u root -p < database/migracion_productos_campos_extra.sql
-     mysql -u root -p < database/migracion_productos_codigo.sql
-     ```
-
-3. **Configurar la conexión a la base de datos**:
-   - Editar `src/conexion/conexionBD.java` con tus credenciales de MySQL.
-
-4. **Compilar el proyecto**:
-   ```bash
-   javac -cp ".:lib/*" src/**/*.java
-   ```
-
-5. **Ejecutar la aplicación**:
-   ```bash
-   java -cp ".:lib/*" main.main
-   ```
 
 ## Configuración
 
@@ -179,9 +155,7 @@ Las operaciones CRUD (Create, Read, Update, Delete) están implementadas en las 
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Abre un Pull Request
 
-## Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
 ## Soporte
 

@@ -1,13 +1,17 @@
 package vista;
 
 import controller.CompraController;
+import controller.ProveedorController;
 import controller.productoController;
 import model.producto;
+import model.proveedor;
 import util.Permisos;
 import util.session;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -19,20 +23,25 @@ import java.util.List;
 public class CompraVista extends JFrame {
 
     private JComboBox<ProductoItem> cbProducto;
+    private JComboBox<ProveedorItem> cbProveedor;
     private JTextField txtCantidad;
     private JTextField txtPrecioUnitario;
+    private JTextField txtSubtotal;
     private JTextArea txtObservaciones;
     private JButton btnComprar;
+    private JButton btnVender;
     private JButton btnLimpiar;
     private JButton btnRefrescar;
     private DefaultTableModel modeloDetalleCompra;
+    private DefaultTableModel modeloCompras;
     private DefaultTableModel modeloDetalleVenta;
     private DefaultTableModel modeloVentas;
     private final CompraController compraController = new CompraController();
     private final productoController productoController = new productoController();
+    private final ProveedorController proveedorController = new ProveedorController();
 
     public CompraVista() {
-        setTitle("Compra de Productos");
+        setTitle("Compras y Ventas de Productos");
         setSize(1150, 680);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -46,6 +55,7 @@ public class CompraVista extends JFrame {
         add(mainPanel);
         aplicarPermisos();
         cargarProductos();
+        cargarProveedores();
         cargarTablas();
     }
 
@@ -80,7 +90,7 @@ public class CompraVista extends JFrame {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setBorder(new EmptyBorder(15, 20, 15, 20));
-        JLabel titleLabel = new JLabel("🛒 COMPRA DE PRODUCTOS");
+        JLabel titleLabel = new JLabel("COMPRAS Y VENTAS DE PRODUCTOS");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
         panel.add(titleLabel);
@@ -114,7 +124,7 @@ public class CompraVista extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel formTitle = new JLabel("REGISTRAR COMPRA");
+        JLabel formTitle = new JLabel("REGISTRAR COMPRA / VENTA");
         formTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
         formTitle.setForeground(Color.WHITE);
         formTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -122,16 +132,23 @@ public class CompraVista extends JFrame {
         panel.add(Box.createVerticalStrut(20));
 
         cbProducto = crearComboProducto(panel, "Producto");
-        txtCantidad = crearCampo(panel, "Cantidad a comprar");
+        cbProveedor = crearComboProveedor(panel, "Proveedor");
+        txtCantidad = crearCampo(panel, "Cantidad");
         txtPrecioUnitario = crearCampo(panel, "Precio unitario");
+        txtSubtotal = crearCampo(panel, "Subtotal");
+        txtSubtotal.setEditable(false);
+        txtSubtotal.setText("0.00");
+        agregarCalculoSubtotal();
         txtObservaciones = crearArea(panel, "Observaciones");
 
-        JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10));
         buttonPanel.setOpaque(false);
         btnComprar = crearBoton("COMPRAR", new Color(70, 150, 220), this::registrarCompra);
+        btnVender = crearBoton("VENDER", new Color(220, 135, 70), this::registrarVenta);
         btnLimpiar = crearBoton("LIMPIAR", new Color(150, 150, 150), this::limpiarCampos);
         btnRefrescar = crearBoton("REFRESCAR", new Color(100, 180, 120), this::refrescarTodo);
         buttonPanel.add(btnComprar);
+        buttonPanel.add(btnVender);
         buttonPanel.add(btnLimpiar);
         buttonPanel.add(btnRefrescar);
 
@@ -152,6 +169,24 @@ public class CompraVista extends JFrame {
         panel.add(label);
 
         JComboBox<ProductoItem> combo = new JComboBox<>();
+        combo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        combo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        combo.setBackground(new Color(50, 65, 95));
+        combo.setForeground(Color.WHITE);
+        panel.add(combo);
+        panel.add(Box.createVerticalStrut(12));
+        return combo;
+    }
+
+    /**
+     * BLOQUE: Combo de proveedores
+     * Para: Seleccionar a que proveedor se le hace la compra.
+     */
+    private JComboBox<ProveedorItem> crearComboProveedor(JPanel panel, String etiqueta) {
+        JLabel label = crearEtiqueta(etiqueta);
+        panel.add(label);
+
+        JComboBox<ProveedorItem> combo = new JComboBox<>();
         combo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         combo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
         combo.setBackground(new Color(50, 65, 95));
@@ -205,6 +240,45 @@ public class CompraVista extends JFrame {
     }
 
     /**
+     * BLOQUE: Calcular subtotal
+     * Para: Mostrar cantidad * precio antes de guardar la compra.
+     */
+    private void agregarCalculoSubtotal() {
+        DocumentListener listener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                actualizarSubtotal();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                actualizarSubtotal();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                actualizarSubtotal();
+            }
+        };
+        txtCantidad.getDocument().addDocumentListener(listener);
+        txtPrecioUnitario.getDocument().addDocumentListener(listener);
+    }
+
+    /**
+     * BLOQUE: Actualizar subtotal
+     * Para: Recalcular el valor mostrado sin guardar todavia.
+     */
+    private void actualizarSubtotal() {
+        try {
+            int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+            double precio = Double.parseDouble(txtPrecioUnitario.getText().trim());
+            txtSubtotal.setText(String.format("%.2f", cantidad * precio));
+        } catch (NumberFormatException e) {
+            txtSubtotal.setText("0.00");
+        }
+    }
+
+    /**
      * BLOQUE: Etiqueta
      * Para: Unificar textos pequenos de formulario.
      */
@@ -220,7 +294,7 @@ public class CompraVista extends JFrame {
      * Para: Explicar por que el boton comprar puede estar deshabilitado.
      */
     private JLabel crearNotaPermisos() {
-        JLabel label = new JLabel("<html><center>Admin y usuario pueden comprar.<br>Consultor solo puede consultar tablas.</center></html>");
+        JLabel label = new JLabel("<html><center>Admin y usuario pueden comprar/vender.<br>Consultor solo puede consultar tablas.</center></html>");
         label.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         label.setForeground(new Color(180, 190, 210));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -234,10 +308,27 @@ public class CompraVista extends JFrame {
     private JTabbedPane crearPanelTablas() {
         JTabbedPane tabs = new JTabbedPane();
         tabs.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tabs.addTab("Compras", crearTablaCompras());
         tabs.addTab("Detalle Compra", crearTablaDetalleCompra());
         tabs.addTab("Detalle Venta", crearTablaDetalleVenta());
         tabs.addTab("Ventas", crearTablaVentas());
         return tabs;
+    }
+
+    /**
+     * BLOQUE: Tabla compras
+     * Para: Mostrar cada compra con su proveedor, total y usuario.
+     */
+    private JPanel crearTablaCompras() {
+        modeloCompras = new DefaultTableModel(
+                new String[]{"ID Compra", "Fecha", "Proveedor", "Total", "Usuario", "Observaciones"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        return crearPanelTabla("COMPRAS", modeloCompras);
     }
 
     /**
@@ -246,7 +337,7 @@ public class CompraVista extends JFrame {
      */
     private JPanel crearTablaDetalleCompra() {
         modeloDetalleCompra = new DefaultTableModel(
-                new String[]{"ID Detalle", "ID Compra", "Fecha", "Producto", "Cantidad", "Precio", "Subtotal", "Usuario", "Observaciones"}, 0
+                new String[]{"ID Detalle", "ID Compra", "Fecha", "Proveedor", "Producto", "Cantidad", "Precio", "Subtotal", "Usuario", "Observaciones"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -262,7 +353,7 @@ public class CompraVista extends JFrame {
      */
     private JPanel crearTablaDetalleVenta() {
         modeloDetalleVenta = new DefaultTableModel(
-                new String[]{"ID Detalle", "ID Venta", "Fecha", "Producto", "Cantidad", "Precio", "Subtotal", "Usuario", "Observaciones"}, 0
+                new String[]{"ID Detalle", "ID Venta", "ID Producto", "Cantidad", "Precio"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -278,7 +369,7 @@ public class CompraVista extends JFrame {
      */
     private JPanel crearTablaVentas() {
         modeloVentas = new DefaultTableModel(
-                new String[]{"ID Venta", "Fecha", "Total", "Usuario", "Observaciones"}, 0
+                new String[]{"ID Venta", "Fecha", "Total", "Usuario", "Observacion"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -355,9 +446,12 @@ public class CompraVista extends JFrame {
     private void aplicarPermisos() {
         boolean puedeComprar = Permisos.puedeRegistrarCompras();
         btnComprar.setEnabled(puedeComprar);
+        btnVender.setEnabled(puedeComprar);
         cbProducto.setEnabled(puedeComprar);
+        cbProveedor.setEnabled(puedeComprar);
         txtCantidad.setEnabled(puedeComprar);
         txtPrecioUnitario.setEnabled(puedeComprar);
+        txtSubtotal.setEnabled(false);
         txtObservaciones.setEnabled(puedeComprar);
     }
 
@@ -374,10 +468,23 @@ public class CompraVista extends JFrame {
     }
 
     /**
+     * BLOQUE: Cargar proveedores
+     * Para: Llenar el combo con proveedores existentes.
+     */
+    private void cargarProveedores() {
+        cbProveedor.removeAllItems();
+        List<proveedor> proveedores = proveedorController.obtenerTodos();
+        for (proveedor p : proveedores) {
+            cbProveedor.addItem(new ProveedorItem(p));
+        }
+    }
+
+    /**
      * BLOQUE: Cargar tablas
      * Para: Refrescar detalle_compra, detalle_venta y ventas desde MySQL.
      */
     private void cargarTablas() {
+        cargarModelo(modeloCompras, compraController.listarCompras());
         cargarModelo(modeloDetalleCompra, compraController.listarDetalleCompra());
         cargarModelo(modeloDetalleVenta, compraController.listarDetalleVenta());
         cargarModelo(modeloVentas, compraController.listarVentas());
@@ -407,14 +514,24 @@ public class CompraVista extends JFrame {
                 return;
             }
 
+            ProveedorItem proveedorItem = (ProveedorItem) cbProveedor.getSelectedItem();
+            if (proveedorItem == null) {
+                JOptionPane.showMessageDialog(this, "Seleccione un proveedor",
+                        "Validacion", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             int cantidad = Integer.parseInt(txtCantidad.getText().trim());
             double precioUnitario = Double.parseDouble(txtPrecioUnitario.getText().trim());
             String usuario = session.usuarioActual == null ? "sin_usuario" : session.usuarioActual.getNombre();
+            int usuarioId = session.usuarioActual == null ? 1 : session.usuarioActual.getId();
 
             boolean guardado = compraController.registrarCompra(
                     item.getId(),
+                    proveedorItem.getId(),
                     cantidad,
                     precioUnitario,
+                    usuarioId,
                     usuario,
                     txtObservaciones.getText().trim()
             );
@@ -435,11 +552,52 @@ public class CompraVista extends JFrame {
     }
 
     /**
+     * BLOQUE: Registrar venta
+     * Para: Guardar venta, detalle_venta y descontar stock.
+     */
+    private void registrarVenta() {
+        try {
+            ProductoItem item = (ProductoItem) cbProducto.getSelectedItem();
+            if (item == null) {
+                JOptionPane.showMessageDialog(this, "Seleccione un producto",
+                        "Validacion", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+            double precio = Double.parseDouble(txtPrecioUnitario.getText().trim());
+            String usuario = session.usuarioActual == null ? "sin_usuario" : session.usuarioActual.getNombre();
+
+            boolean guardado = compraController.registrarVenta(
+                    item.getId(),
+                    cantidad,
+                    precio,
+                    usuario,
+                    txtObservaciones.getText().trim()
+            );
+
+            if (guardado) {
+                JOptionPane.showMessageDialog(this, "Venta registrada exitosamente",
+                        "Exito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarCampos();
+                refrescarTodo();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo registrar la venta. Revise stock y datos.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Cantidad y precio deben ser numeros validos",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
      * BLOQUE: Refrescar todo
      * Para: Actualizar productos y tablas despues de comprar.
      */
     private void refrescarTodo() {
         cargarProductos();
+        cargarProveedores();
         cargarTablas();
     }
 
@@ -450,9 +608,13 @@ public class CompraVista extends JFrame {
     private void limpiarCampos() {
         txtCantidad.setText("");
         txtPrecioUnitario.setText("");
+        txtSubtotal.setText("0.00");
         txtObservaciones.setText("");
         if (cbProducto.getItemCount() > 0) {
             cbProducto.setSelectedIndex(0);
+        }
+        if (cbProveedor.getItemCount() > 0) {
+            cbProveedor.setSelectedIndex(0);
         }
     }
 
@@ -474,6 +636,27 @@ public class CompraVista extends JFrame {
         @Override
         public String toString() {
             return producto.getId() + " - " + producto.getNombre() + " (stock: " + producto.getStock() + ")";
+        }
+    }
+
+    /**
+     * CLASE: ProveedorItem
+     * Para: Mostrar nombre del proveedor y conservar su ID.
+     */
+    private static class ProveedorItem {
+        private final proveedor proveedor;
+
+        ProveedorItem(proveedor proveedor) {
+            this.proveedor = proveedor;
+        }
+
+        int getId() {
+            return proveedor.getId();
+        }
+
+        @Override
+        public String toString() {
+            return proveedor.getId() + " - " + proveedor.getNombre();
         }
     }
 }

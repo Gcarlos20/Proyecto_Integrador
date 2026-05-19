@@ -10,11 +10,11 @@ import java.util.List;
  */
 public class InventarioController {
 
-    private final productoController productoController;
-    private final MovimientoController movimientoController;
+    private final productoController productoController; // Instancia del controlador de productos para acceder a sus métodos
+    private final MovimientoController movimientoController; // Instancia del controlador de movimientos para acceder a sus métodos relacionados con movimientos de inventario
 
-    public InventarioController() {
-        this.productoController = new productoController();
+    public InventarioController() { // Contructor 
+        this.productoController = new productoController(); // Inicializa el controlador de productos para poder usar sus métodos en este controlador
         this.movimientoController = new MovimientoController();
     }
 
@@ -25,14 +25,14 @@ public class InventarioController {
      */
     public Object[] obtenerEstadisticas() {
         try {
-            int totalProductos = productoController.listar().size();
+            int totalProductos = productoController.listar().size(); // obtiene la lista de los productor y los cuenta con el .size()
             int cantidadTotal = productoController.obtenerCantidadTotal();
             double valorTotal = productoController.obtenerValorTotal();
 
             return new Object[]{totalProductos, cantidadTotal, valorTotal};
         } catch (Exception e) {
             System.out.println("Error al obtener estadísticas: " + e.getMessage());
-            return new Object[]{0, 0, 0.0};
+            return new Object[]{0, 0, 0.0}; // Devuelve valores por defecto en caso de error
         }
     }
 

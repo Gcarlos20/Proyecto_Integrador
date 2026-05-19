@@ -7,11 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public class UsuarioDao {
 
     // BLOQUE: Validar credenciales
@@ -21,6 +16,7 @@ public class UsuarioDao {
 
         String sql = """
             SELECT 
+                u.ID_USUARIO AS id_usuario,
                 u.NOMBRE AS nombre,
                 u.PASSWORD AS contrasena,
                 r.TIPO AS rol
@@ -47,6 +43,7 @@ public class UsuarioDao {
                 if (rs.next()) {
                     System.out.println("Usuario encontrado: " + rs.getString("nombre"));
                     return new Usuario(
+                        rs.getInt("id_usuario"),
                         rs.getString("nombre"),
                         rs.getString("contrasena"),
                         rs.getString("rol")

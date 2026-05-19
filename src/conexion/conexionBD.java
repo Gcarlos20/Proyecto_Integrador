@@ -12,14 +12,14 @@ public class conexionBD {
     private static final String USUARIO = "root";
     private static final String PASSWORD = "123456";
 
-    private static final String URL = "jdbc:mysql://" + SERVIDOR + ":" + PUERTO + "/" + BASE_DATOS
-            + "?useSSL=false&serverTimezone=America/Bogota&allowPublicKeyRetrieval=true";
+    private static final String URL = "jdbc:mysql://" + SERVIDOR + ":" + PUERTO + "/" + BASE_DATOS //para evitar errores de timezone y SSL en MySQL Connector/J 8.x
+            + "?useSSL=false&serverTimezone=America/Bogota&allowPublicKeyRetrieval=true"; // URL de conexion con parametros recomendados
 
     // BLOQUE: Abrir conexion
     // Para: Entregar una conexion MySQL lista para consultas de los DAO.
     public static Connection getConexion() throws SQLException {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver"); // Cargar el driver MySQL Connector/J 8.x
         } catch (ClassNotFoundException e) {
             throw new SQLException("Driver MySQL no encontrado. Agregue mysql-connector-j al classpath.", e);
         }

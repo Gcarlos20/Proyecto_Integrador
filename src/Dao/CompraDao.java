@@ -35,8 +35,8 @@ public class CompraDao {
 
         try (Connection conn = conexionBD.getConexion()) {
 
-            conn.setAutoCommit(false);
-            String insertarCompra = crearSqlInsertarCompra(conn);
+            conn.setAutoCommit(false); // Inicia la transacción de 
+            String insertarCompra = crearSqlInsertarCompra(conn); // esto es para insertar la compra principal y obtener su ID para el detalle, se adapta segun las columnas de la tabla COMPRAS
 
             try (
                 PreparedStatement psCompra = conn.prepareStatement(insertarCompra, Statement.RETURN_GENERATED_KEYS);
@@ -50,7 +50,7 @@ public class CompraDao {
 
                 int compraId = obtenerIdGenerado(psCompra);
 
-                // Insertar detalle de compra con precio y subtotal.
+                // Insertar detalle de compra con precio y subtotal psdetakkea el precio unitario y el subtotal de la compra.
                 psDetalle.setInt(1, compraId);
                 psDetalle.setInt(2, productoId);
                 psDetalle.setInt(3, cantidad);

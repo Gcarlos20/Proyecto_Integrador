@@ -26,8 +26,8 @@ public class InventarioController {
     public Object[] obtenerEstadisticas() {
         try {
             int totalProductos = productoController.listar().size(); // obtiene la lista de los productor y los cuenta con el .size()
-            int cantidadTotal = productoController.obtenerCantidadTotal();
-            double valorTotal = productoController.obtenerValorTotal();
+            int cantidadTotal = productoController.obtenerCantidadTotal(); // obtiene la cantidad total de unidades en stock sumando el stock de cada producto
+            double valorTotal = productoController.obtenerValorTotal(); // obtiene el valor total del inventario multiplicando el stock de cada producto por su precio y sumando esos valores para todos los productos
 
             return new Object[]{totalProductos, cantidadTotal, valorTotal};
         } catch (Exception e) {

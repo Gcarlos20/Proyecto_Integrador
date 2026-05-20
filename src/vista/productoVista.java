@@ -412,7 +412,7 @@ public class productoVista extends JFrame {
         // Para: Mostrar en la tabla los productos guardados en la base de datos.
         List<producto> productos = controller.listar();
         for (producto p : productos) {
-            modelo.addRow(new Object[]{
+            modelo.addRow(new Object[]{ // addRow agrega una fila a la tabla con los datos del producto
                 p.getId(),
                 p.getCodigo(),
                 p.getNombre(),

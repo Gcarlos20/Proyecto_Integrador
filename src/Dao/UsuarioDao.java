@@ -28,11 +28,11 @@ public class UsuarioDao {
               AND LOWER(r.TIPO) = LOWER(?)
               AND u.ESTADO = 'ACTIVO'
               AND r.ESTADO = 'ACTIVO'
-        """;
+                                    """;
 
         try (
             Connection conn = conexionBD.getConexion();
-            PreparedStatement ps = conn.prepareStatement(sql)
+            PreparedStatement ps = conn.prepareStatement(sql) // Prepara la consulta SQL para buscar el usuario con los parámetros proporcionados
         ) {
 
             ps.setString(1, nombre);

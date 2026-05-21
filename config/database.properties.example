@@ -1,0 +1,5 @@
+db.servidor=localhost
+db.puerto=3306
+db.base_datos=inventario
+db.usuario=root
+db.password=

@@ -1,0 +1,5 @@
+config/database.properties
+*.class
+out/
+build/
+target/
